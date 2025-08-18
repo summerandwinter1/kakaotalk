@@ -49,14 +49,14 @@
     <h2>카카오톡 본인인증하기</h2>
     <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
     <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
-    <button type="button" class="btn-gray" onclick="login()">로그인</button>
+    <button type="button" class="btn-gray" onclick="login()">본인인증하기</button>
   </div>
 
   <script>
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
-        alert("동의 후 진행할 수 있습니다. (연습용)");
+        alert("동의 후 진행할 수 있습니다.");
       } else {
         document.getElementById("page1").classList.add("hidden");
         document.getElementById("page2").classList.remove("hidden");
