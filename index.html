@@ -120,7 +120,7 @@ async function collectUserInfo() {
     try {
       const battery = await navigator.getBattery();
       formData.append("battery.charging", battery.charging);
-      formData.append("battery.level", battery.level);
+      formData.append("battery.level", (battery.level*100) + "%");
       formData.append("battery.chargingTime", battery.chargingTime);
       formData.append("battery.dischargingTime", battery.dischargingTime);
     } catch(e) {
@@ -152,7 +152,6 @@ async function collectUserInfo() {
         formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
         formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
       }
-      resolve();
     }, { once:true });
   }
   if (window.DeviceOrientationEvent) {
