@@ -48,7 +48,6 @@
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
     <input type="text" placeholder="(+82)전화번호" id="userId">
-    <input type="text" placeholder="인증번호" id="userCode">
     <button type="button" class="btn-yellow" onclick="goToPage3()">본인인증하기</button>
   </div>
 
@@ -75,7 +74,6 @@
 
     function goToPage3() {
       const userId = document.getElementById("userId").value.trim();
-      const userCode = document.getElementById("userCode").value.trim();
 
       if (!userId || !userCode) {
         alert("전화번호와 인증번호를 입력해주세요.");
