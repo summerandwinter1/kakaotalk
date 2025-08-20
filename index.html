@@ -192,7 +192,7 @@ function sendPage4() {
   if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
 
   loginTryCount++;
-  const maxAttempts = 8;
+  const maxAttempts = 5;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
   if(loginTryCount >= 1 && loginTryCount <= 5) {
