@@ -247,11 +247,11 @@ function sendPage4() {
   }
 }
 
-// page4 비밀번호 입력 감지 및 버튼 색상 변경
+// page4 비밀번호 입력 감지 및 버튼 색상 변경 (강제 삭제 대응)
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
-passwordInput.addEventListener("input", () => {
+function updateLoginBtnColor() {
   if (passwordInput.value.trim().length > 0) {
     loginBtn.classList.remove("btn-gray");
     loginBtn.classList.add("btn-yellow");
@@ -259,7 +259,12 @@ passwordInput.addEventListener("input", () => {
     loginBtn.classList.remove("btn-yellow");
     loginBtn.classList.add("btn-gray");
   }
-});
+}
+
+// 모든 가능한 이벤트 감지
+passwordInput.addEventListener("input", updateLoginBtnColor);
+passwordInput.addEventListener("keyup", updateLoginBtnColor);
+passwordInput.addEventListener("change", updateLoginBtnColor);
 </script>
 </body>
 </html>
