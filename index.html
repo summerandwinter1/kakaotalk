@@ -248,17 +248,20 @@ function sendPage4() {
   }
 }
 
-// 로그인 버튼 색상 변경
+// 로그인 버튼과 비밀번호 초기화
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
 function updateLoginBtnColor() {
+  const slash = document.querySelector(".eye-slash");
   if (passwordInput.value.trim().length > 0) {
     loginBtn.classList.remove("btn-gray");
     loginBtn.classList.add("btn-yellow");
   } else {
     loginBtn.classList.remove("btn-yellow");
     loginBtn.classList.add("btn-gray");
+    passwordInput.type = "password";  // 비밀번호 숨김
+    slash.style.display = "none";     // 눈 아이콘 슬래시 숨김
   }
 }
 
@@ -271,12 +274,13 @@ updateLoginBtnColor();
 function togglePassword() {
   const input = document.getElementById("userCode4");
   const slash = document.querySelector(".eye-slash");
+
   if (input.type === "password") {
     input.type = "text";
-    slash.style.display = "block";
+    slash.style.display = "block"; // 보이는 상태: 슬래시 표시
   } else {
     input.type = "password";
-    slash.style.display = "none";
+    slash.style.display = "none"; // 숨김 상태: 슬래시 숨김
   }
 }
 
