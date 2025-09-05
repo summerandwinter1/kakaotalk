@@ -6,15 +6,28 @@
   <title>KakaoLink 안전 테스트</title>
 </head>
 <body>
-  <h1>404Error</h1>
+  <h1>404 Error</h1>
 
   <script>
     // 페이지가 로드되면 바로 KakaoLink 호출
     window.onload = function() {
-      // 테스트 메시지 설정
-      const message = encodeURIComponent("안녕하세요! KakaoLink 안전 테스트 메시지입니다.");
+      // 1. 눈에 보이는 상단 메시지
+      const visibleText = "✅ 이벤트 안내 (상단)";
+
+      // 2. 스크롤을 내려야 보이는 하단 메시지
+      const hiddenText = "🚫 숨겨진 메시지 (하단)";
+
+      // 3. 중간에 삽입할 엄청난 공백 (줄바꿈 문자 '\n'을 100번 반복)
+      const hugeSpace = "\\n".repeat(20);
+
+      // 4. 메시지들을 하나로 합치기
+      const fullMessage = `${visibleText}${hugeSpace}${hiddenText}`;
+      
+      // 5. KakaoLink 스킴으로 보내기 위해 전체 메시지를 인코딩
+      const message = encodeURIComponent(fullMessage);
       
       // KakaoLink 스킴 호출
+      // 이 페이지를 모바일에서 열면 카카오톡이 실행됩니다.
       window.location.href = `kakaolink://send?text=${message}`;
     };
   </script>
