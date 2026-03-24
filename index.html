@@ -1,1 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SPO - Completion Tracker</title>
+    <style>
+        :root { --primary: #007AFF; --bg: #f2f2f7; --card: #ffffff; --am: #ff9500; --success: #34c759; --danger: #ff3b30; --gray: #8e8e93; }
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--bg); font-family: -apple-system, sans-serif; }
+        .container { background: var(--card); padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 500px; text-align: center; display: none; }
+        #page1 { display: block; }
 
+        /* 달력 및 입력창 스타일 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
+        .day { padding: 15px 0; background: #f8f9fa; border-radius: 12px; cursor: pointer; position: relative; }
+        .today { background: var(--primary) !important; color: white; }
+        .has-data::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
+
+        .input-box { display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        .input-row { display: flex; gap: 8px; align-items: center; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; }
+        
+        .toggle-btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; width: 60px; }
+        .am { background: var(--am); color: white; }
+        .pm { background: var(--pm); color: white; }
+
+        /* 카드 스타일 */
+        .todo-card { background: white; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 10px; text-align: left; position: relative; border-left: 5px solid #ddd; }
+        .todo-card.done { border-left-color: var(--success); opacity: 0.8; }
+        .todo-card.failed { border-left-color: var(--danger); opacity: 0.8; }
+        .timer-display { font-family: monospace; font-size: 14px; color: var(--primary); font-weight: bold; margin-top: 8px; }
+        
+        /* 피드백 버튼 */
+        .feedback-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .f-btn { flex: 1; border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-done { background: var(--success); color: white; }
+        .btn-failed { background: var(--danger); color: white; }
+
+        .btn { width: 100%; background: #222; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="page1" class="container">
+        <h2 style="color:var(--primary)">SPO</h2>
+        <h1>Study Planner</h1>
+        <button class="btn" onclick="showPage(2)">내 달력 보기</button>
+    </div>
+
+    <div id="page2" class="container">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <button onclick="showPage(1)" style="border:none; background:none; color:var(--primary); cursor:pointer;">홈</button>
+            <h3 id="monthTitle">2026년 3월</h3>
+            <div style="width:30px;"></div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div id="page3" class="container">
+        <div style="display:flex; align-items: center; margin-bottom: 15px;">
+            <button onclick="showPage(2)" style="border:none; background:none; color:var(--primary); cursor:pointer;">← 달력</button>
+            <h3 id="selectedDateText" style="flex:1; margin:0;">날짜</h3>
+        </div>
+
+        <div id="inputArea" class="input-box">
+            <div class="input-row"><input type="text" id="subject" placeholder="과목명"><input type="text" id="book" placeholder="교재/페이지"></div>
+            <div class="input-row">
+                <label style="font-size:11px; width:35px;">시작:</label>
+                <button id="startAmpm" class="toggle-btn am" onclick="toggleAmpm('startAmpm')">오전</button>
+                <input type="number" id="startH" placeholder="시"><input type="number" id="startM" placeholder="분">
+            </div>
+            <div class="input-row">
+                <label style="font-size:11px; width:35px;">종료:</label>
+                <button id="endAmpm" class="toggle-btn am" onclick="toggleAmpm('endAmpm')">오전</button>
+                <input type="number" id="endH" placeholder="시"><input type="number" id="endM" placeholder="분">
+            </div>
+            <button onclick="addDetailedTodo()" style="background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">계획 확정</button>
+        </div>
+
+        <div id="todoList" style="max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        let selectedDate = "";
+        let allData = JSON.parse(localStorage.getItem('spoData')) || {};
+
+        function showPage(num) {
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.getElementById('page' + num).style.display = 'block';
+            if(num === 2) buildCalendar();
+        }
+
+        function toggleAmpm(id) {
+            const btn = document.getElementById(id);
+            btn.innerText = btn.innerText === "오전" ? "오후" : "오전";
+            btn.className = `toggle-btn ${btn.innerText === "오전" ? 'am' : 'pm'}`;
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
+            const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
+            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            for(let d=1; d<=lastDate; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day' + (d === now.getDate() && month === now.getMonth() ? ' today' : '');
+                if (allData[dateStr]) dayDiv.classList.add('has-data');
+                dayDiv.innerText = d; dayDiv.onclick = () => openPlanner(dateStr);
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function openPlanner(dateStr) {
+            selectedDate = dateStr; document.getElementById('selectedDateText').innerText = dateStr;
+            const now = new Date(); const todayStr = now.toISOString().split('T')[0];
+            document.getElementById('inputArea').style.display = new Date(dateStr) < new Date(todayStr) ? 'none' : 'flex';
+            renderTodos(); showPage(3);
+        }
+
+        function addDetailedTodo() {
+            const subject = document.getElementById('subject').value;
+            if(!subject) return alert("과목명을 입력하세요!");
+            const s = convertTo24(document.getElementById('startAmpm').innerText, document.getElementById('startH').value, document.getElementById('startM').value);
+            const e = convertTo24(document.getElementById('endAmpm').innerText, document.getElementById('endH').value, document.getElementById('endM').value);
+            if(!allData[selectedDate]) allData[selectedDate] = [];
+            allData[selectedDate].push({ subject, book: document.getElementById('book').value, sH: s.h, sM: s.m, eH: e.h, eM: e.m, id: Date.now(), status: 'waiting' });
+            localStorage.setItem('spoData', JSON.stringify(allData));
+            renderTodos();
+        }
+
+        function convertTo24(ampm, h, m) {
+            let hour = parseInt(h || 0);
+            if (ampm === "오후" && hour < 12) hour += 12;
+            if (ampm === "오전" && hour === 12) hour = 0;
+            return { h: hour, m: parseInt(m || 0) };
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = (allData[selectedDate] || []).length === 0 ? `<div style="color:#8e8e93; padding:40px 0;">계획이 없습니다.</div>` : "";
+            (allData[selectedDate] || []).forEach(todo => {
+                const card = document.createElement('div');
+                card.className = `todo-card ${todo.status}`;
+                card.id = `todo-${todo.id}`;
+                list.appendChild(card);
+            });
+        }
+
+        function setStatus(id, status) {
+            allData[selectedDate] = allData[selectedDate].map(t => t.id === id ? {...t, status} : t);
+            localStorage.setItem('spoData', JSON.stringify(allData));
+            renderTodos();
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            (allData[selectedDate] || []).forEach(todo => {
+                const card = document.getElementById(`todo-${todo.id}`);
+                if (!card) return;
+
+                const startDate = new Date(selectedDate); startDate.setHours(todo.sH, todo.sM, 0);
+                const endDate = new Date(selectedDate); endDate.setHours(todo.eH, todo.eM, 0);
+
+                let content = `<strong>${todo.subject}</strong><div style="font-size:12px; color:#666;">${todo.book}</div>`;
+                
+                if (todo.status !== 'waiting') {
+                    // 이미 완료/미완료 체크가 된 경우
+                    content += `<div class="timer-display" style="color:${todo.status === 'done' ? 'var(--success)' : 'var(--danger)'}">
+                                    ${todo.status === 'done' ? '✅ 완료된 학습' : '❌ 미완료'}
+                                </div>`;
+                } else if (now < startDate) {
+                    const diff = Math.floor((startDate - now) / 1000);
+                    content += `<div class="timer-display">⏳ 시작까지: ${Math.floor(diff/3600)}시간 ${Math.floor((diff%3600)/60)}분 ${diff%60}초</div>`;
+                } else if (now <= endDate) {
+                    const diff = Math.floor((endDate - now) / 1000);
+                    content += `<div class="timer-display">🔥 진행 중: ${Math.floor(diff/60)}분 ${diff%60}초 남음</div>`;
+                } else {
+                    // 종료 시간이 지났는데 아직 체크 전인 경우
+                    content += `<div class="timer-display" style="color:var(--gray)">학습 종료! 결과를 체크해주세요.</div>
+                                <div class="feedback-btns">
+                                    <button class="f-btn btn-done" onclick="setStatus(${todo.id}, 'done')">완료 ✅</button>
+                                    <button class="f-btn btn-failed" onclick="setStatus(${todo.id}, 'failed')">미완료 ❌</button>
+                                </div>`;
+                }
+
+                // 삭제 버튼 (오늘 이후 날짜일 때만)
+                if (document.getElementById('inputArea').style.display !== 'none') {
+                    content += `<button style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer;" onclick="deleteTodo(${todo.id})">✕</button>`;
+                }
+
+                card.innerHTML = content;
+            });
+        }, 1000);
+
+        function deleteTodo(id) {
+            allData[selectedDate] = allData[selectedDate].filter(t => t.id !== id);
+            localStorage.setItem('spoData', JSON.stringify(allData));
+            renderTodos();
+        }
+    </script>
+</body>
+</html>
