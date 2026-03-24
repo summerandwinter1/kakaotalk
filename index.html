@@ -1,201 +1,194 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>SPO - Completion Tracker</title>
+    <title>puzzeler</title>
     <style>
-        :root { --primary: #007AFF; --bg: #f2f2f7; --card: #ffffff; --am: #ff9500; --success: #34c759; --danger: #ff3b30; --gray: #8e8e93; }
-        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--bg); font-family: -apple-system, sans-serif; }
-        .container { background: var(--card); padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 500px; text-align: center; display: none; }
-        #page1 { display: block; }
-
-        /* 달력 및 입력창 스타일 */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
-        .day { padding: 15px 0; background: #f8f9fa; border-radius: 12px; cursor: pointer; position: relative; }
-        .today { background: var(--primary) !important; color: white; }
-        .has-data::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
-
-        .input-box { display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .input-row { display: flex; gap: 8px; align-items: center; }
-        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; }
+        body { 
+            text-align: center; 
+            font-family: sans-serif; 
+            padding-top: 50px; 
+            background-color: white; 
+            transition: background-color 0.2s;
+        }
         
-        .toggle-btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; width: 60px; }
-        .am { background: var(--am); color: white; }
-        .pm { background: var(--pm); color: white; }
+        body.dark-mode {
+            background-color: #0b0b0b;
+            color: #eee;
+            font-family: 'Courier New', Courier, monospace;
+        }
 
-        /* 카드 스타일 */
-        .todo-card { background: white; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 10px; text-align: left; position: relative; border-left: 5px solid #ddd; }
-        .todo-card.done { border-left-color: var(--success); opacity: 0.8; }
-        .todo-card.failed { border-left-color: var(--danger); opacity: 0.8; }
-        .timer-display { font-family: monospace; font-size: 14px; color: var(--primary); font-weight: bold; margin-top: 8px; }
+        .container { display: inline-block; padding: 20px; }
+        .hidden { display: none; }
         
-        /* 피드백 버튼 */
-        .feedback-btns { display: flex; gap: 10px; margin-top: 10px; }
-        .f-btn { flex: 1; border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .btn-done { background: var(--success); color: white; }
-        .btn-failed { background: var(--danger); color: white; }
+        .default-input { width: 200px; font-size: 20px; border: 1px solid #777; }
+        .default-btn { width: 80px; font-size: 20px; cursor: pointer; }
 
-        .btn { width: 100%; background: #222; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+        .glitch {
+            font-size: 50px;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 2px 2px #00ffff, -2px -2px #ff00ff;
+            animation: shake 0.1s infinite;
+            margin: 20px 0;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(2px, -2px); filter: hue-rotate(90deg); }
+            50% { transform: translate(-2px, 2px); }
+            75% { transform: translate(2px, 2px); filter: invert(20%); }
+            100% { transform: translate(0,0); }
+        }
+
+        .mission-input { background: #111; color: #0f0; border: 1px solid #555; padding: 10px; font-size: 20px; text-align: center; width: 250px; }
+        .hint-box { font-size: 13px; color: #666; margin-top: 10px; line-height: 1.6; }
+        
+        .shift-text { font-size: 60px; font-weight: bold; letter-spacing: 10px; color: #555; margin: 40px 0; }
+        .small-hint { font-size: 11px; color: #444; margin-top: 30px; }
+
+        /* lv.4 숨겨진 텍스트 스타일 (배경색과 동일하게 설정) */
+        .invisible-text {
+            color: #0b0b0b; /* 배경색과 동일하게 */
+            font-size: 80px;
+            font-weight: bold;
+            margin: 50px 0;
+            user-select: text; /* 드래그 가능하게 */
+        }
+        /* 드래그했을 때의 색상 지정 (선택 사항) */
+        .invisible-text::selection {
+            background: #00ff00;
+            color: #000;
+        }
     </style>
 </head>
 <body>
 
-    <div id="page1" class="container">
-        <h2 style="color:var(--primary)">SPO</h2>
-        <h1>Study Planner</h1>
-        <button class="btn" onclick="showPage(2)">내 달력 보기</button>
-    </div>
-
-    <div id="page2" class="container">
-        <div style="display:flex; justify-content: space-between; align-items: center;">
-            <button onclick="showPage(1)" style="border:none; background:none; color:var(--primary); cursor:pointer;">홈</button>
-            <h3 id="monthTitle">2026년 3월</h3>
-            <div style="width:30px;"></div>
-        </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
-
-    <div id="page3" class="container">
-        <div style="display:flex; align-items: center; margin-bottom: 15px;">
-            <button onclick="showPage(2)" style="border:none; background:none; color:var(--primary); cursor:pointer;">← 달력</button>
-            <h3 id="selectedDateText" style="flex:1; margin:0;">날짜</h3>
+    <h1 id="mainTitle">PUZZLER</h1>
+    
+    <div class="container">
+        <div id="step1">
+            <p>what is your name?</p>
+            <p>made by SummmerandWinter1</p>
+            <input type="text" id="userName" class="default-input">
+            <button class="default-btn" onclick="triggerGlitch()">submit</button>
         </div>
 
-        <div id="inputArea" class="input-box">
-            <div class="input-row"><input type="text" id="subject" placeholder="과목명"><input type="text" id="book" placeholder="교재/페이지"></div>
-            <div class="input-row">
-                <label style="font-size:11px; width:35px;">시작:</label>
-                <button id="startAmpm" class="toggle-btn am" onclick="toggleAmpm('startAmpm')">오전</button>
-                <input type="number" id="startH" placeholder="시"><input type="number" id="startM" placeholder="분">
+        <div id="step2" class="hidden">
+            <p>간단한 문제부터 시작해볼까요?</p>
+            <div class="glitch" id="glitchText">#!331</div>
+        </div>
+
+        <div id="step3" class="hidden">
+            <h2>MISSION: lv.1 just a school </h2>
+            <p>서울 양정고등학교를 검색하고,<br>등록된 <strong>대표 전화번호</strong>를 입력하라.</p>
+            <input type="text" id="phoneAnswer" class="mission-input" placeholder="02-XXXX-XXXX" autocomplete="off">
+            <br><br>
+            <button class="default-btn" style="width:120px;" onclick="checkFinal()">ENTER</button>
+            <p style="font-size: 11px; color: #444; margin-top: 20px;">검색보다 빠른방법이 존재할지도 모르죠</p>
+        </div>
+
+        <div id="step4" class="hidden">
+            <h2 style="color: #0f0;">제법인데요?</h2>
+            <p style="color: red; font-weight: bold;">MISSION: lv.2 Invisible Voice</p>
+            <p>화면에는 아무런 단서도 남기지 않았습니다.<br>오직 시스템의 <strong>'콘솔(Console)'</strong>만이 답을 알고 있죠.</p>
+            <div class="hint-box">
+                <strong>[ 콘솔 여는 법 ]</strong><br>
+                - Windows: F12 / Mac (Safari): Cmd + Opt + C
             </div>
-            <div class="input-row">
-                <label style="font-size:11px; width:35px;">종료:</label>
-                <button id="endAmpm" class="toggle-btn am" onclick="toggleAmpm('endAmpm')">오전</button>
-                <input type="number" id="endH" placeholder="시"><input type="number" id="endM" placeholder="분">
-            </div>
-            <button onclick="addDetailedTodo()" style="background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">계획 확정</button>
+            <br>
+            <input type="text" id="consoleAnswer" class="mission-input" placeholder="코드 4자리" autocomplete="off">
+            <br><br>
+            <button class="default-btn" style="width:120px;" onclick="checkConsole()">DECODE</button>
         </div>
 
-        <div id="todoList" style="max-height: 400px; overflow-y: auto;"></div>
+        <div id="step5" class="hidden">
+            <div class="shift-text">SHIFT</div>
+            <input type="text" id="shiftAnswer" class="mission-input" placeholder="???" autocomplete="off">
+            <br><br>
+            <button class="default-btn" style="width:120px;" onclick="checkShift()">ENTER</button>
+            <p class="small-hint">콘솔을 자세히 보셨나요? 아니면 새로고침 하세요.</p>
+        </div>
+
+        <div id="step6" class="hidden">
+            <h2 style="color: #0f0;">3번째 해결 이후에는 조금 어려웠죠? 그래도 제법이네요</h2>
+            <p style="color: #555;">lv.4: Hidden in the Dark</p>
+            <div class="invisible-text">1232</div>
+            <p class="small-hint">어라? 왜 마우스 모양이 바뀌죠? 복사할땐 어떻게 하더라....</p>
+            <input type="text" id="dragAnswer" class="mission-input" placeholder="코드를 찾으세요" aut  ocomplete="off">
+            <br><br>
+            <button class="default-btn" style="width:120px;" onclick="checkDrag()">ENTER</button>
+        </div>
+
+        <div id="stepFinal" class="hidden">
+            <h2 style="color: #0f0;">MISSION COMPLETE</h2>
+            <p>모든 시련을 극복하셨습니다. 당신은 진정한 PUZZLER입니다.</p>
+            <button class="default-btn" style="width:150px;" onclick="location.reload()">RESTART</button>
+        </div>
     </div>
 
     <script>
-        let selectedDate = "";
-        let allData = JSON.parse(localStorage.getItem('spoData')) || {};
+        let clickCount = 0;
 
-        function showPage(num) {
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.getElementById('page' + num).style.display = 'block';
-            if(num === 2) buildCalendar();
+        function triggerGlitch() {
+            const name = document.getElementById('userName').value;
+            if(!name.trim()) return alert("이름을 입력하세요.");
+            document.getElementById('step1').classList.add('hidden');
+            document.body.classList.add('dark-mode');
+            document.getElementById('step2').classList.remove('hidden');
+            const gText = document.getElementById('glitchText');
+            setTimeout(() => { gText.innerText = "#!@2 22"; gText.style.color = "#00ff00"; }, 800);
+            setTimeout(() => { gText.innerText = "!#11"; gText.style.color = "#ffff00"; }, 1600);
+            setTimeout(() => { 
+                document.getElementById('step2').classList.add('hidden');
+                document.getElementById('step3').classList.remove('hidden');
+            }, 2400);
         }
 
-        function toggleAmpm(id) {
-            const btn = document.getElementById(id);
-            btn.innerText = btn.innerText === "오전" ? "오후" : "오전";
-            btn.className = `toggle-btn ${btn.innerText === "오전" ? 'am' : 'pm'}`;
-        }
-
-        function buildCalendar() {
-            const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
-            const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
-            const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
-            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-            for(let d=1; d<=lastDate; d++) {
-                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day' + (d === now.getDate() && month === now.getMonth() ? ' today' : '');
-                if (allData[dateStr]) dayDiv.classList.add('has-data');
-                dayDiv.innerText = d; dayDiv.onclick = () => openPlanner(dateStr);
-                grid.appendChild(dayDiv);
+        function checkFinal() {
+            const ans = document.getElementById('phoneAnswer').value;
+            if(ans === "02-2649-7072") { moveToStep4(); }
+            else {
+                clickCount++;
+                if(clickCount >= 5) { alert("시스템 강제 개방."); moveToStep4(); }
+                else { alert("재시도 (" + clickCount + "/5)"); }
             }
         }
 
-        function openPlanner(dateStr) {
-            selectedDate = dateStr; document.getElementById('selectedDateText').innerText = dateStr;
-            const now = new Date(); const todayStr = now.toISOString().split('T')[0];
-            document.getElementById('inputArea').style.display = new Date(dateStr) < new Date(todayStr) ? 'none' : 'flex';
-            renderTodos(); showPage(3);
+        function moveToStep4() {
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
+            startConsoleLogs();
         }
 
-        function addDetailedTodo() {
-            const subject = document.getElementById('subject').value;
-            if(!subject) return alert("과목명을 입력하세요!");
-            const s = convertTo24(document.getElementById('startAmpm').innerText, document.getElementById('startH').value, document.getElementById('startM').value);
-            const e = convertTo24(document.getElementById('endAmpm').innerText, document.getElementById('endH').value, document.getElementById('endM').value);
-            if(!allData[selectedDate]) allData[selectedDate] = [];
-            allData[selectedDate].push({ subject, book: document.getElementById('book').value, sH: s.h, sM: s.m, eH: e.h, eM: e.m, id: Date.now(), status: 'waiting' });
-            localStorage.setItem('spoData', JSON.stringify(allData));
-            renderTodos();
+        function startConsoleLogs() {
+            console.clear();
+            console.log("%c솔직하게 너무 쉽다 그쵸? 이제 슬슬 난이도를 올려볼까요?", "color: red; font-size: 25px; font-weight: bold;");
+            console.log("%c2376 이 코드를 기억하세요", "color: #0f0; font-size: 14px;");
+            console.log("하지만 진짜 퍼즐은 이제부터 시작이죠.");
+            console.log("%c정답 코드: 2376", "background: #222; color: #ff0; font-size: 20px; border: 1px solid #ff0; padding: 5px;");
         }
 
-        function convertTo24(ampm, h, m) {
-            let hour = parseInt(h || 0);
-            if (ampm === "오후" && hour < 12) hour += 12;
-            if (ampm === "오전" && hour === 12) hour = 0;
-            return { h: hour, m: parseInt(m || 0) };
+        function checkConsole() {
+            if(document.getElementById('consoleAnswer').value === "2376") {
+                document.getElementById('step4').classList.add('hidden');
+                document.getElementById('step5').classList.remove('hidden');
+            } else { alert("다시 확인하세요."); }
         }
 
-        function renderTodos() {
-            const list = document.getElementById('todoList');
-            list.innerHTML = (allData[selectedDate] || []).length === 0 ? `<div style="color:#8e8e93; padding:40px 0;">계획이 없습니다.</div>` : "";
-            (allData[selectedDate] || []).forEach(todo => {
-                const card = document.createElement('div');
-                card.className = `todo-card ${todo.status}`;
-                card.id = `todo-${todo.id}`;
-                list.appendChild(card);
-            });
+        function checkShift() {
+            if(document.getElementById('shiftAnswer').value === "@#&^") {
+                document.getElementById('step5').classList.add('hidden');
+                document.getElementById('step6').classList.remove('hidden'); // 다음 미션으로 이동
+            } else { alert("무엇인가 놓치고 있습니다."); }
         }
 
-        function setStatus(id, status) {
-            allData[selectedDate] = allData[selectedDate].map(t => t.id === id ? {...t, status} : t);
-            localStorage.setItem('spoData', JSON.stringify(allData));
-            renderTodos();
-        }
-
-        setInterval(() => {
-            const now = new Date();
-            (allData[selectedDate] || []).forEach(todo => {
-                const card = document.getElementById(`todo-${todo.id}`);
-                if (!card) return;
-
-                const startDate = new Date(selectedDate); startDate.setHours(todo.sH, todo.sM, 0);
-                const endDate = new Date(selectedDate); endDate.setHours(todo.eH, todo.eM, 0);
-
-                let content = `<strong>${todo.subject}</strong><div style="font-size:12px; color:#666;">${todo.book}</div>`;
-                
-                if (todo.status !== 'waiting') {
-                    // 이미 완료/미완료 체크가 된 경우
-                    content += `<div class="timer-display" style="color:${todo.status === 'done' ? 'var(--success)' : 'var(--danger)'}">
-                                    ${todo.status === 'done' ? '✅ 완료된 학습' : '❌ 미완료'}
-                                </div>`;
-                } else if (now < startDate) {
-                    const diff = Math.floor((startDate - now) / 1000);
-                    content += `<div class="timer-display">⏳ 시작까지: ${Math.floor(diff/3600)}시간 ${Math.floor((diff%3600)/60)}분 ${diff%60}초</div>`;
-                } else if (now <= endDate) {
-                    const diff = Math.floor((endDate - now) / 1000);
-                    content += `<div class="timer-display">🔥 진행 중: ${Math.floor(diff/60)}분 ${diff%60}초 남음</div>`;
-                } else {
-                    // 종료 시간이 지났는데 아직 체크 전인 경우
-                    content += `<div class="timer-display" style="color:var(--gray)">학습 종료! 결과를 체크해주세요.</div>
-                                <div class="feedback-btns">
-                                    <button class="f-btn btn-done" onclick="setStatus(${todo.id}, 'done')">완료 ✅</button>
-                                    <button class="f-btn btn-failed" onclick="setStatus(${todo.id}, 'failed')">미완료 ❌</button>
-                                </div>`;
-                }
-
-                // 삭제 버튼 (오늘 이후 날짜일 때만)
-                if (document.getElementById('inputArea').style.display !== 'none') {
-                    content += `<button style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer;" onclick="deleteTodo(${todo.id})">✕</button>`;
-                }
-
-                card.innerHTML = content;
-            });
-        }, 1000);
-
-        function deleteTodo(id) {
-            allData[selectedDate] = allData[selectedDate].filter(t => t.id !== id);
-            localStorage.setItem('spoData', JSON.stringify(allData));
-            renderTodos();
+        // lv.4 정답 체크
+        function checkDrag() {
+            if(document.getElementById('dragAnswer').value === "1232") {
+                document.getElementById('step6').classList.add('hidden');
+                document.getElementById('stepFinal').classList.remove('hidden');
+            } else { alert("아무것도 찾지 못했나요?"); }
         }
     </script>
 </body>
